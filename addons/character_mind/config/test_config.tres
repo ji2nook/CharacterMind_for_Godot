@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="CharacterAIConfig" format=3 uid="uid://cst8a47atlbmv"]
+
+[ext_resource type="Script" uid="uid://dli61yag1ni50" path="res://addons/character_mind/config/character_ai_config.gd" id="1_kek5s"]
+
+[resource]
+script = ExtResource("1_kek5s")
+metadata/_custom_type_script = "uid://dli61yag1ni50"

@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://c686egmrgftws"]
+
+[ext_resource type="Script" uid="uid://xihlpls0xlhb" path="res://addons/character_mind/demo/test_scene.gd" id="1_s118h"]
+[ext_resource type="Script" uid="uid://c6v3cqah74xt4" path="res://addons/character_mind/chat/character_chat.gd" id="2_psu8r"]
+[ext_resource type="Resource" uid="uid://cst8a47atlbmv" path="res://addons/character_mind/config/test_config.tres" id="3_psu8r"]
+
+[node name="TestScene" type="Node" unique_id=197752086]
+script = ExtResource("1_s118h")
+
+[node name="SharedModel" type="NobodyWhoModel" parent="." unique_id=740376170]
+model_path = "res://models/Qwen3-0.6B-Q8_0.gguf"
+
+[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("model_node")]
+script = ExtResource("2_psu8r")
+config = ExtResource("3_psu8r")
+model_node = NodePath("../SharedModel")
+metadata/_custom_type_script = "uid://c6v3cqah74xt4"
+
+[node name="InputBox" type="LineEdit" parent="." unique_id=1099289362]
+offset_right = 68.5
+offset_bottom = 31.0
+
+[node name="ResponseLabel" type="Label" parent="." unique_id=99389030]
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="SendButton" type="Button" parent="." unique_id=2018676367]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "전송"
