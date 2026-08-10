@@ -1,0 +1,12 @@
+*.gguf
+
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# NobodyWho 바이너리 (AssetLib에서 직접 설치)
+addons/nobodywho/
+
+# 개발 내부 문서
+CLAUDE.md
+DEVELOPMENT_GUIDE.md
