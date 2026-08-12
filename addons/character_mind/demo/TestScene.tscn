@@ -35,7 +35,6 @@ grow_vertical = 2
 [node name="ChatLog" type="RichTextLabel" parent="UI/Layout" unique_id=1045502894]
 layout_mode = 2
 size_flags_vertical = 3
-autowrap_mode = 3
 bbcode_enabled = true
 
 [node name="InputRow" type="HBoxContainer" parent="UI/Layout" unique_id=1702310163]
