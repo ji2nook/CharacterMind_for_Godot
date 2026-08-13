@@ -70,10 +70,11 @@ func _on_response_finished(full_text: String) -> void:
 
 ## 전체 응답 텍스트에서 <think>...</think> 블록을 제거하고 반환
 func _strip_thinking(text: String) -> String:
+	const THINK_CLOSE_LEN: int = 8  # len("</think>")
 	var end_idx := text.find("</think>")
 	if end_idx == -1:
 		return text.strip_edges()
-	return text.substr(end_idx + "</think>".length()).strip_edges()
+	return text.substr(end_idx + THINK_CLOSE_LEN).strip_edges()
 
 func _pick_fallback() -> String:
 	if guardrail and not guardrail.fallback_lines.is_empty():

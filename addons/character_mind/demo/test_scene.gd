@@ -9,6 +9,7 @@ extends Node
 # --- 단어 단위 스트리밍 ---
 ## 가드레일을 통과한 단어들을 순서대로 보관하는 큐
 var _pending_tokens: Array[String] = []
+var _token_read_idx: int = 0
 var _mutex: Mutex = Mutex.new()
 var _token_timer: float = 0.0
 
@@ -24,7 +25,10 @@ var _thinking_timer: float = 0.0
 var _thinking_dot_count: int = 1
 const THINKING_INTERVAL: float = 0.4
 
+var _scrollbar: VScrollBar
+
 func _ready() -> void:
+	_scrollbar = chat_log.get_v_scroll_bar()
 	send_button.pressed.connect(_on_send_pressed)
 	input_box.text_submitted.connect(func(_t): _on_send_pressed())
 	npc_chat.response_token.connect(_on_response_token)
@@ -42,18 +46,21 @@ func _process(delta: float) -> void:
 			chat_log.append_text("[i]생각 중%s[/i]" % ".".repeat(_thinking_dot_count))
 			_scroll_to_bottom()
 
-	if _pending_tokens.is_empty():
+	if _token_read_idx >= _pending_tokens.size():
 		return
 	_token_timer += delta
 	if _token_timer < TOKEN_INTERVAL:
 		return
 	_token_timer = 0.0
 	_mutex.lock()
-	if _pending_tokens.is_empty():
+	if _token_read_idx >= _pending_tokens.size():
 		_mutex.unlock()
 		return
-	var token: String = _pending_tokens[0]
-	_pending_tokens.remove_at(0)
+	var token: String = _pending_tokens[_token_read_idx]
+	_token_read_idx += 1
+	if _token_read_idx >= _pending_tokens.size():
+		_pending_tokens.clear()
+		_token_read_idx = 0
 	_mutex.unlock()
 	_chat_log_content += token
 	chat_log.append_text(token)
@@ -110,5 +117,4 @@ func _on_response_received(_text: String) -> void:
 
 ## 스크롤바를 최하단으로 이동해 최신 메시지가 보이게 함
 func _scroll_to_bottom() -> void:
-	var scrollbar: VScrollBar = chat_log.get_v_scroll_bar()
-	scrollbar.value = scrollbar.max_value
+	_scrollbar.value = _scrollbar.max_value
