@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://xihlpls0xlhb" path="res://addons/character_mind/demo/test_scene.gd" id="1_s118h"]
 [ext_resource type="Script" uid="uid://c6v3cqah74xt4" path="res://addons/character_mind/chat/character_chat.gd" id="2_psu8r"]
 [ext_resource type="Resource" uid="uid://cst8a47atlbmv" path="res://addons/character_mind/config/test_config.tres" id="3_psu8r"]
+[ext_resource type="Script" uid="uid://ck487qvgluc6g" path="res://addons/character_mind/guardrail/character_guardrail.gd" id="4_ua7wq"]
 
 [node name="TestScene" type="Node" unique_id=197752086]
 script = ExtResource("1_s118h")
@@ -10,11 +11,17 @@ script = ExtResource("1_s118h")
 [node name="SharedModel" type="NobodyWhoModel" parent="." unique_id=740376170]
 model_path = "res://models/Qwen3-0.6B-Q8_0.gguf"
 
-[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("model_node")]
+[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "model_node")]
 script = ExtResource("2_psu8r")
 config = ExtResource("3_psu8r")
+guardrail = NodePath("Guardrail")
 model_node = NodePath("../SharedModel")
 metadata/_custom_type_script = "uid://c6v3cqah74xt4"
+
+[node name="Guardrail" type="Node" parent="NPCChat" unique_id=1585572361]
+script = ExtResource("4_ua7wq")
+blocked_keywords = Array[String](["감자튀김", "햄버거"])
+metadata/_custom_type_script = "uid://ck487qvgluc6g"
 
 [node name="UI" type="Control" parent="." unique_id=1265819672]
 layout_mode = 3
