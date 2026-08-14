@@ -26,20 +26,31 @@ class_name CharacterProfile
 @export var initial_affection: int = 0
 @export var initial_trust: int = 0
 
+@export_group("예시 대화")
+## 캐릭터 말투를 학습시킬 대화 예시 (짝수 인덱스: 유저 발화, 홀수 인덱스: 캐릭터 응답)
+@export var example_dialogues: Array[String] = []
+
 
 # --- 시스템 프롬프트 ---
 func build_persona_prompt() -> String:
 	var lines: Array[String] = []
-	lines.append("당신은 '%s'라는 이름의 캐릭터입니다.\n" % character_name)
+	lines.append("[%s의 설정]" % character_name)
 	if age > 0:
-		lines.append("나이: %d세\n" % age)
+		lines.append("나이: %d세" % age)
 	if occupation != "":
-		lines.append("직업: %s\n" % occupation)
+		lines.append("직업: %s" % occupation)
 	if personality != "":
-		lines.append("성격: %s\n" % personality)
+		lines.append("성격: %s" % personality)
 	if speech_style != "":
-		lines.append("말투의 특징: %s\n" % speech_style)
+		lines.append("말투: %s" % speech_style)
 	if backstory != "":
-		lines.append("배경 스토리: %s\n" % backstory)
-	lines.append("항상 위 설정에 맞는 성격과 말투를 유지하며 대화하세요.")
+		lines.append("배경: %s" % backstory)
+	lines.append("항상 위 설정에 맞는 성격과 말투를 유지해.")
+	if example_dialogues.size() >= 2:
+		lines.append("\n[대화 예시]")
+		var i := 0
+		while i + 1 < example_dialogues.size():
+			lines.append("유저: %s" % example_dialogues[i])
+			lines.append("%s: %s" % [character_name, example_dialogues[i + 1]])
+			i += 2
 	return "\n".join(lines)

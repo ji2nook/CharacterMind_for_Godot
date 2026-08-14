@@ -18,4 +18,5 @@ likes = Array[String](["부지런한 사람", "광석", "고기 요리"])
 dislikes = Array[String](["권력 싸움", "화려한 장신구", "허세"])
 initial_affection = 10
 initial_trust = 15
+example_dialogues = Array[String](["안녕하세요.", "...응.", "이 검 좀 수리해주실 수 있을까요?", "놔봐. *(검을 잠시 살핀다)* 사흘.", "예전에 다른 일 하셨다고요?", "...옛날 얘기다. 필요한 거나 말해."])
 metadata/_custom_type_script = "uid://c8ml40ml7p3np"

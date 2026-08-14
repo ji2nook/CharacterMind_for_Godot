@@ -38,8 +38,11 @@ var _thinking_dot_count: int = 1
 const THINKING_INTERVAL: float = 0.4
 
 var _scrollbar: VScrollBar
+var _action_regex: RegEx
 
 func _ready() -> void:
+	_action_regex = RegEx.new()
+	_action_regex.compile("\\*\\(([^)]+)\\)\\*")
 	_scrollbar = chat_log.get_v_scroll_bar()
 	send_button.pressed.connect(_on_send_pressed)
 	input_box.text_submitted.connect(func(_t): _on_send_pressed())
@@ -107,12 +110,16 @@ func _process(delta: float) -> void:
 	chat_log.append_text(token)
 	_scroll_to_bottom()
 
+## *(행동)* 구문을 기울임·회색 BBCode로 변환하고 기호*()*는 제거
+func _format_with_actions(text: String) -> String:
+	return _action_regex.sub(text, "[i][color=#aaaaaa]$1[/color][/i]", true)
+
 ## 입력창의 텍스트를 채팅 로그에 표시하고 NPC에게 메시지 전달
 func _on_send_pressed() -> void:
 	var msg: String = input_box.text.strip_edges()
 	if msg == "":
 		return
-	var entry := "\n[b]나:[/b] %s\n[b]%s:[/b] " % [msg, current_profile.character_name]
+	var entry := "\n[b]나:[/b] %s\n[b]%s:[/b] " % [_format_with_actions(msg), current_profile.character_name]
 	_chat_log_content += entry
 	chat_log.append_text(entry)
 	_is_thinking = true
@@ -130,18 +137,35 @@ func _stop_thinking() -> void:
 	chat_log.append_text(_chat_log_content)
 	_scroll_to_bottom()
 
-## 가드레일을 통과한 전체 응답을 공백 기준으로 단어 단위로 쪼개 큐에 추가
+## 응답 텍스트를 일반 구간과 *(행동)* 구간으로 분리해 토큰 큐에 추가
+## 행동 구간은 BBCode로 감싸 기울임·회색으로 표시
 func _on_response_token(token: String) -> void:
 	_stop_thinking()
 	_mutex.lock()
-	var parts := token.split(" ")
-	for i in range(parts.size()):
-		var word: String = parts[i]
-		if i < parts.size() - 1:
-			word += " "  # 단어 사이 공백 복원
-		if word != "":
-			_pending_tokens.append(word)
+	for t in _tokenize_response(token):
+		_pending_tokens.append(t)
 	_mutex.unlock()
+
+func _tokenize_response(text: String) -> Array[String]:
+	var result: Array[String] = []
+	var last_end := 0
+	for m in _action_regex.search_all(text):
+		if m.get_start() > last_end:
+			_split_words(text.substr(last_end, m.get_start() - last_end), result)
+		result.append("[i][color=#aaaaaa]%s[/color][/i]" % m.get_string(1))
+		last_end = m.get_end()
+	if last_end < text.length():
+		_split_words(text.substr(last_end), result)
+	return result
+
+func _split_words(text: String, out: Array[String]) -> void:
+	var words := text.split(" ")
+	for i in range(words.size()):
+		var word: String = words[i]
+		if i < words.size() - 1:
+			word += " "
+		if word != "":
+			out.append(word)
 
 ## 가드레일 차단 시 fallback을 큐에 추가
 func _on_guardrail_blocked(fallback: String) -> void:

@@ -21,8 +21,11 @@ signal guardrail_blocked(fallback: String)
 var _chat: NobodyWhoChat
 ## 다음 send_message() 호출 전에 대화 기록을 초기화해야 하는지 여부
 var _needs_reset := false
+var _emoji_regex: RegEx
 
 func _ready() -> void:
+	_emoji_regex = RegEx.new()
+	_emoji_regex.compile("[\\x{1F000}-\\x{1FAFF}\\x{2600}-\\x{27BF}\\x{FE00}-\\x{FEFF}]")
 	_setup_chat()
 
 ## NobodyWhoChat 인스턴스를 새로 생성하고 시그널을 연결 — 대화 기록이 완전히 초기화됨
@@ -65,7 +68,7 @@ func _on_response_updated(_token: String) -> void:
 
 ## 응답 완료 시 전체 텍스트를 검열하고 통과한 경우에만 emit
 func _on_response_finished(full_text: String) -> void:
-	var clean_text := _strip_thinking(full_text)
+	var clean_text := _strip_emoji(_strip_thinking(full_text))
 	if guardrail and guardrail.check(clean_text) != clean_text:
 		_needs_reset = true
 		var fallback := _pick_fallback()
@@ -75,6 +78,9 @@ func _on_response_finished(full_text: String) -> void:
 	if clean_text != "":
 		response_token.emit(clean_text)
 	response_received.emit(clean_text)
+
+func _strip_emoji(text: String) -> String:
+	return _emoji_regex.sub(text, "", true)
 
 ## 전체 응답 텍스트에서 <think>...</think> 블록을 제거하고 반환
 func _strip_thinking(text: String) -> String:

@@ -14,6 +14,7 @@ bob_profile = ExtResource("3_nweab")
 
 [node name="SharedModel" type="NobodyWhoModel" parent="." unique_id=740376170]
 model_path = "res://models/Qwen3-0.6B-Q8_0.gguf"
+n_ctx = 2048
 
 [node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "model_node")]
 script = ExtResource("2_psu8r")
