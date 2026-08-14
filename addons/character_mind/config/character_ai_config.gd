@@ -12,9 +12,18 @@ class_name CharacterAIConfig
 ## 금지 키워드
 @export var forbidden_topics: Array[String] = ["폭력", "정치", "혐오 발언"]
 
+var _cached_prompt: String = ""
+var _prompt_dirty: bool = true
+
+## 빌드된 프롬프트 캐시를 무효화 — 캐릭터 전환 또는 설정 변경 시 호출
+func mark_dirty() -> void:
+	_prompt_dirty = true
+
 
 # --- 시스템 프롬프트 + 가드레일 정의 ---
 func build_safe_system_prompt() -> String:
+	if not _prompt_dirty:
+		return _cached_prompt
 	# /no_think: Qwen3 thinking 모드 비활성화 (응답 속도 향상)
 	# _strip_thinking()이 폴백으로 동작하므로 작동하지 않아도 안전
 	var parts: Array[String] = ["/no_think"]
@@ -28,4 +37,6 @@ func build_safe_system_prompt() -> String:
 	parts.append("행동이나 감정 표현은 *(행동)* 형식으로 써. 예: *(웃으며)* 안녕!")
 	if not forbidden_topics.is_empty():
 		parts.append("다음 주제가 나오면 캐릭터답게 자연스럽게 화제를 돌려: " + ", ".join(forbidden_topics))
-	return "\n\n".join(parts)
+	_cached_prompt = "\n\n".join(parts)
+	_prompt_dirty = false
+	return _cached_prompt

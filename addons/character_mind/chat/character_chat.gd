@@ -45,19 +45,18 @@ func _setup_chat() -> void:
 ## 대화 상대를 다른 캐릭터로 전환
 func switch_character(new_profile: CharacterProfile) -> void:
 	config.profile = new_profile
+	config.mark_dirty()
 	_needs_reset = true
 
 ## 플레이어 메시지를 NobodyWho 채팅에 전달
 func send_message(player_text: String) -> void:
-	var system_text := config.build_safe_system_prompt()
 	if _needs_reset:
 		_needs_reset = false
 		_setup_chat()
-		_chat.system_prompt = system_text
 		# 새 NobodyWhoChat이 model_node 연결을 마칠 수 있도록 한 프레임 뒤에 say() 호출
 		call_deferred("_do_say", player_text)
 		return
-	_chat.system_prompt = system_text
+	_chat.system_prompt = config.build_safe_system_prompt()
 	_chat.say(player_text)
 
 func _do_say(player_text: String) -> void:
@@ -69,12 +68,13 @@ func _on_response_updated(_token: String) -> void:
 ## 응답 완료 시 전체 텍스트를 검열하고 통과한 경우에만 emit
 func _on_response_finished(full_text: String) -> void:
 	var clean_text := _strip_emoji(_strip_thinking(full_text))
-	if guardrail and guardrail.check(clean_text) != clean_text:
-		_needs_reset = true
-		var fallback := _pick_fallback()
-		guardrail_blocked.emit(fallback)
-		response_received.emit(fallback)
-		return
+	if guardrail:
+		var result := guardrail.check(clean_text)
+		if result != clean_text:
+			_needs_reset = true
+			guardrail_blocked.emit(result)
+			response_received.emit(result)
+			return
 	if clean_text != "":
 		response_token.emit(clean_text)
 	response_received.emit(clean_text)
@@ -89,8 +89,3 @@ func _strip_thinking(text: String) -> String:
 	if end_idx == -1:
 		return text.strip_edges()
 	return text.substr(end_idx + THINK_CLOSE_LEN).strip_edges()
-
-func _pick_fallback() -> String:
-	if guardrail and not guardrail.fallback_lines.is_empty():
-		return guardrail.fallback_lines[randi() % guardrail.fallback_lines.size()]
-	return "..."

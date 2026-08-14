@@ -44,6 +44,7 @@ func _ready() -> void:
 	_action_regex = RegEx.new()
 	_action_regex.compile("\\*\\(([^)]+)\\)\\*")
 	_scrollbar = chat_log.get_v_scroll_bar()
+	set_process(false)
 	send_button.pressed.connect(_on_send_pressed)
 	input_box.text_submitted.connect(func(_t): _on_send_pressed())
 	npc_chat.response_token.connect(_on_response_token)
@@ -91,6 +92,8 @@ func _process(delta: float) -> void:
 			_scroll_to_bottom()
 
 	if _token_read_idx >= _pending_tokens.size():
+		if not _is_thinking:
+			set_process(false)
 		return
 	_token_timer += delta
 	if _token_timer < TOKEN_INTERVAL:
@@ -125,6 +128,7 @@ func _on_send_pressed() -> void:
 	_is_thinking = true
 	_thinking_timer = 0.0
 	_thinking_dot_count = 1
+	set_process(true)
 	chat_log.append_text("[i]생각 중.[/i]")
 	input_box.text = ""
 	npc_chat.send_message(msg)
