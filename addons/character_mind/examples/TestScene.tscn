@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c686egmrgftws"]
 
-[ext_resource type="Script" uid="uid://xihlpls0xlhb" path="res://addons/character_mind/demo/test_scene.gd" id="1_s118h"]
+[ext_resource type="Script" uid="uid://xihlpls0xlhb" path="res://addons/character_mind/examples/test_scene.gd" id="1_s118h"]
 [ext_resource type="Script" uid="uid://c6v3cqah74xt4" path="res://addons/character_mind/chat/character_chat.gd" id="2_psu8r"]
 [ext_resource type="Resource" uid="uid://cst8a47atlbmv" path="res://addons/character_mind/config/test_config.tres" id="3_psu8r"]
 [ext_resource type="Script" uid="uid://ck487qvgluc6g" path="res://addons/character_mind/guardrail/character_guardrail.gd" id="4_ua7wq"]
