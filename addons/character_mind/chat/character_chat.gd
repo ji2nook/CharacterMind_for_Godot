@@ -41,12 +41,15 @@ func _setup_chat() -> void:
 
 ## 플레이어 메시지를 NobodyWho 채팅에 전달
 func send_message(player_text: String) -> void:
+	var system_text := config.build_safe_system_prompt()
 	if _needs_reset:
 		_needs_reset = false
 		_setup_chat()
+		_chat.system_prompt = system_text
 		# 새 NobodyWhoChat이 model_node 연결을 마칠 수 있도록 한 프레임 뒤에 say() 호출
 		call_deferred("_do_say", player_text)
 		return
+	_chat.system_prompt = system_text
 	_chat.say(player_text)
 
 func _do_say(player_text: String) -> void:

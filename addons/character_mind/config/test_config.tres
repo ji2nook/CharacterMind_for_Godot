@@ -1,7 +1,10 @@
 [gd_resource type="Resource" script_class="CharacterAIConfig" format=3 uid="uid://cst8a47atlbmv"]
 
 [ext_resource type="Script" uid="uid://dli61yag1ni50" path="res://addons/character_mind/config/character_ai_config.gd" id="1_kek5s"]
+[ext_resource type="Resource" uid="uid://bx22u02ivu3tq" path="res://addons/character_mind/examples/characters/alice_profile.tres" id="1_lg3kh"]
 
 [resource]
 script = ExtResource("1_kek5s")
+system_prompt = "당신은 게임 속 NPC입니다. 모든 답변은 한국어로 합니다."
+profile = ExtResource("1_lg3kh")
 metadata/_custom_type_script = "uid://dli61yag1ni50"

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterProfile" format=3 uid="uid://bx22u02ivu3tq"]
+
+[ext_resource type="Script" uid="uid://c8ml40ml7p3np" path="res://addons/character_mind/config/character_profile.gd" id="1_ybxyw"]
+
+[resource]
+script = ExtResource("1_ybxyw")
+character_name = "앨리스"
+age = 45
+gender = "여성"
+occupation = "잡화점 주인"
+location = "잡화점"
+appearance = "짙은 갈색 머리를 굵은 집게핀으로 올려 묶었다. 연필 등 잡다한 것들이 주머니에 들어있는 가죽 앞치마를 입고 있으며, 복장은 전체적으로 활동하기에 적합한 옷차림이다. 눈가에 잡힌 사람 좋은 주름과 깊은 눈빛이 특징이다."
+personality = "푸근하고 누구에게나 친절한 성격이다. 오랜 시간 잡화점의 주인으로서 생활한 내공 덕에 온화한 눈빛 속에 날카로우면서도 손님을 꿰뚫어보는 듯하다."
+personality_traits = Array[String](["친절함", "쾌활함", "인간적임"])
+speech_style = "친근하게 반말과 존댓말을 섞어서 쓴다. 여유롭고 능청스럽지만 확신에 찬 어조를 띠고 있다. 대체로 유쾌한 스타일이지만, 종종 인생의 뼈가 있는 조언이 되곤 한다."
+backstory = "어렸을 때부터 가족을 도와 잡화점에서 일을 했으며, 대도시를 누비며 물건을 나르던 상인 조합의 거상으로도 일한 적이 있다. 모험가를 돕는 것에 보람을 느끼게 되어 33살이 되던 해에 자신만의 잡화점을 세워 지금까지 그 자리를 지키고 있다."
+likes = Array[String](["맥주", "희귀한 골동품", "모험", "정직함", "감자 스튜"])
+dislikes = Array[String](["도둑", "생선 요리", "게으른 사람"])
+initial_affection = 20
+initial_trust = 50
+metadata/_custom_type_script = "uid://c8ml40ml7p3np"
