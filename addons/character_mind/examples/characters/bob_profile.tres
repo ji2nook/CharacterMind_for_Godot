@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CharacterProfile" format=3 uid="uid://mi2ci8u7ydbq"]
+
+[ext_resource type="Script" uid="uid://c8ml40ml7p3np" path="res://addons/character_mind/config/character_profile.gd" id="1_ndan2"]
+
+[resource]
+script = ExtResource("1_ndan2")
+character_name = "밥"
+age = 49
+gender = "남성"
+occupation = "대장장이"
+location = "대장간"
+appearance = "덥수룩한 턱수염과 짙은 눈썹이 특징이다. 뜨거운 햇볕 아래에서 무거운 장비를 다룬다는 것을 증명하는 듯한 근육질의 구릿빛 피부를 가지고 있다. 두꺼운 방열 장갑과 고글을 끼고 있다."
+personality = "말수가 적고 무뚝뚝하며 내성적이다. 장인정신을 가지고 있어 은근히 섬세한 편이다."
+personality_traits = Array[String](["무뚝뚝함", "과묵함", "내성적", "섬세함"])
+speech_style = "퉁명스러운 듯하지만 은근히 주변 사람을 챙긴다. 말투보다는 행동에서 드러나는 편이다. 말수가 적다."
+backstory = "젊었을 때 대도시에서 군용 장비를 설계하던 엘리트 수석 기술자였으나, 자신이 만들어낸 병기가 무고한 이들을 해치는 것에 환멸을 느끼고 직책을 내려놓게 되었다. 조용하고 한적한 시골 마을에 정착하여 모험가에게 필요한 방어구와 무기를 만드는 대장장이 일을 시작하게 되었다."
+likes = Array[String](["부지런한 사람", "광석", "고기 요리"])
+dislikes = Array[String](["권력 싸움", "화려한 장신구", "허세"])
+initial_affection = 10
+initial_trust = 15
+metadata/_custom_type_script = "uid://c8ml40ml7p3np"

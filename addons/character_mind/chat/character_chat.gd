@@ -39,6 +39,11 @@ func _setup_chat() -> void:
 	_chat.response_updated.connect(_on_response_updated)
 	_chat.response_finished.connect(_on_response_finished)
 
+## 대화 상대를 다른 캐릭터로 전환
+func switch_character(new_profile: CharacterProfile) -> void:
+	config.profile = new_profile
+	_needs_reset = true
+
 ## 플레이어 메시지를 NobodyWho 채팅에 전달
 func send_message(player_text: String) -> void:
 	var system_text := config.build_safe_system_prompt()

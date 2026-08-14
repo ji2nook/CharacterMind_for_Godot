@@ -1,10 +1,22 @@
 extends Node
 
-# --- UI 노드 참조 ---
+# --- UI 노드 참조 : 첫 페이지 ---
+@onready var select_screen: Control = $UI/SelectScreen
+@onready var dialogue_screen: Control = $UI/DialogueScreen
+@onready var alice_button: Button = $UI/SelectScreen/SelectLayout/AliceButton
+@onready var bob_button: Button = $UI/SelectScreen/SelectLayout/BobButton
+@onready var exit_button: Button = $UI/DialogueScreen/Layout/ExitButton
+
+@export var alice_profile: CharacterProfile
+@export var bob_profile: CharacterProfile
+
+var current_profile: CharacterProfile
+
+# --- UI 노드 참조 : 대화 페이지 ---
 @onready var npc_chat = $NPCChat
-@onready var input_box = $UI/Layout/InputRow/InputBox
-@onready var send_button = $UI/Layout/InputRow/SendButton
-@onready var chat_log = $UI/Layout/ChatLog
+@onready var input_box = $UI/DialogueScreen/Layout/InputRow/InputBox
+@onready var send_button = $UI/DialogueScreen/Layout/InputRow/SendButton
+@onready var chat_log = $UI/DialogueScreen/Layout/ChatLog
 
 # --- 단어 단위 스트리밍 ---
 ## 가드레일을 통과한 단어들을 순서대로 보관하는 큐
@@ -34,6 +46,35 @@ func _ready() -> void:
 	npc_chat.response_token.connect(_on_response_token)
 	npc_chat.response_received.connect(_on_response_received)
 	npc_chat.guardrail_blocked.connect(_on_guardrail_blocked)
+	
+	# 캐릭터 선택 화면이 먼저 보이도록 초기화
+	select_screen.visible = true
+	dialogue_screen.visible = false
+	
+	alice_button.pressed.connect(func(): _start_conversation(alice_profile))
+	bob_button.pressed.connect(func(): _start_conversation(bob_profile))
+	exit_button.pressed.connect(_end_conversation)
+
+func _start_conversation(profile: CharacterProfile) -> void:
+	if profile == null:
+		return
+	current_profile = profile
+	npc_chat.switch_character(profile)
+	_chat_log_content = ""
+	chat_log.clear()
+	_pending_tokens.clear()
+	_token_read_idx = 0
+	_token_timer = 0.0
+	_is_thinking = false
+	_thinking_timer = 0.0
+	_thinking_dot_count = 1
+	select_screen.visible = false
+	dialogue_screen.visible = true
+
+func _end_conversation() -> void:
+	current_profile = null
+	dialogue_screen.visible = false
+	select_screen.visible = true
 
 func _process(delta: float) -> void:
 	if _is_thinking:
@@ -71,7 +112,7 @@ func _on_send_pressed() -> void:
 	var msg: String = input_box.text.strip_edges()
 	if msg == "":
 		return
-	var entry := "\n[b]나:[/b] %s\n[b]NPC:[/b] " % msg
+	var entry := "\n[b]나:[/b] %s\n[b]%s:[/b] " % [msg, current_profile.character_name]
 	_chat_log_content += entry
 	chat_log.append_text(entry)
 	_is_thinking = true

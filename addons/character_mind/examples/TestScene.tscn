@@ -1,12 +1,16 @@
 [gd_scene format=3 uid="uid://c686egmrgftws"]
 
 [ext_resource type="Script" uid="uid://xihlpls0xlhb" path="res://addons/character_mind/examples/test_scene.gd" id="1_s118h"]
+[ext_resource type="Resource" uid="uid://bx22u02ivu3tq" path="res://addons/character_mind/examples/characters/alice_profile.tres" id="2_k0n7s"]
 [ext_resource type="Script" uid="uid://c6v3cqah74xt4" path="res://addons/character_mind/chat/character_chat.gd" id="2_psu8r"]
+[ext_resource type="Resource" uid="uid://mi2ci8u7ydbq" path="res://addons/character_mind/examples/characters/bob_profile.tres" id="3_nweab"]
 [ext_resource type="Resource" uid="uid://cst8a47atlbmv" path="res://addons/character_mind/config/test_config.tres" id="3_psu8r"]
 [ext_resource type="Script" uid="uid://ck487qvgluc6g" path="res://addons/character_mind/guardrail/character_guardrail.gd" id="4_ua7wq"]
 
 [node name="TestScene" type="Node" unique_id=197752086]
 script = ExtResource("1_s118h")
+alice_profile = ExtResource("2_k0n7s")
+bob_profile = ExtResource("3_nweab")
 
 [node name="SharedModel" type="NobodyWhoModel" parent="." unique_id=740376170]
 model_path = "res://models/Qwen3-0.6B-Q8_0.gguf"
@@ -31,7 +35,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Layout" type="VBoxContainer" parent="UI" unique_id=1650870801]
+[node name="DialogueScreen" type="Control" parent="UI" unique_id=1630433976]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -39,18 +43,64 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ChatLog" type="RichTextLabel" parent="UI/Layout" unique_id=1045502894]
+[node name="Layout" type="VBoxContainer" parent="UI/DialogueScreen" unique_id=1650870801]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ChatLog" type="RichTextLabel" parent="UI/DialogueScreen/Layout" unique_id=1045502894]
 layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
 
-[node name="InputRow" type="HBoxContainer" parent="UI/Layout" unique_id=1702310163]
+[node name="InputRow" type="HBoxContainer" parent="UI/DialogueScreen/Layout" unique_id=1702310163]
 layout_mode = 2
 
-[node name="InputBox" type="LineEdit" parent="UI/Layout/InputRow" unique_id=1099289362]
+[node name="InputBox" type="LineEdit" parent="UI/DialogueScreen/Layout/InputRow" unique_id=1099289362]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SendButton" type="Button" parent="UI/Layout/InputRow" unique_id=2018676367]
+[node name="SendButton" type="Button" parent="UI/DialogueScreen/Layout/InputRow" unique_id=2018676367]
 layout_mode = 2
 text = "전송"
+
+[node name="ExitButton" type="Button" parent="UI/DialogueScreen/Layout" unique_id=1664437213]
+layout_mode = 2
+text = "캐릭터 선택으로 돌아가기"
+
+[node name="SelectScreen" type="Control" parent="UI" unique_id=410505641]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SelectLayout" type="VBoxContainer" parent="UI/SelectScreen" unique_id=1117933095]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="UI/SelectScreen/SelectLayout" unique_id=461507799]
+layout_mode = 2
+text = "대화하고 싶은 캐릭터를 선택하세요"
+
+[node name="AliceButton" type="Button" parent="UI/SelectScreen/SelectLayout" unique_id=573408255]
+layout_mode = 2
+text = "앨리스"
+
+[node name="BobButton" type="Button" parent="UI/SelectScreen/SelectLayout" unique_id=1232385074]
+layout_mode = 2
+text = "밥"
