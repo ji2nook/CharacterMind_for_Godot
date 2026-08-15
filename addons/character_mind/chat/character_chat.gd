@@ -36,7 +36,7 @@ func _ready() -> void:
 	_emoji_regex.compile("[\\x{1F000}-\\x{1FAFF}\\x{2600}-\\x{27BF}\\x{FE00}-\\x{FEFF}]")
 	backend.system_prompt = config.build_safe_system_prompt()
 	backend.response_finished.connect(_on_response_finished)
-	backend.request_failed.connect(func(msg: String) -> void: request_failed.emit(msg))
+	backend.request_failed.connect(request_failed.emit)
 
 ## 대화 상대를 다른 캐릭터로 전환
 func switch_character(new_profile: CharacterProfile) -> void:
@@ -52,39 +52,54 @@ func switch_character(new_profile: CharacterProfile) -> void:
 
 ## 플레이어 메시지를 백엔드에 전달
 func send_message(player_text: String) -> void:
+	if guardrail:
+		var checked := guardrail.check(player_text)
+		if checked != player_text:
+			guardrail_blocked.emit(checked)
+			response_received.emit(checked)
+			return
+
 	var system_text := config.build_safe_system_prompt()
-	if emotion:
-		system_text += "\n" + emotion.get_dynamic_prompt_context()
-	if mood:
-		system_text += "\n" + mood.get_mood_prompt_line()
 	if action:
 		system_text += action.build_action_instruction()
-
 	backend.system_prompt = system_text
+
+	# 동적 상태(감정/무드)는 시스템 프롬프트 대신 유저 메시지 앞에 주입
+	# → 시스템 프롬프트가 턴마다 바뀌지 않아 로컬 KV 캐시가 보존됨
+	var context_parts: Array[String] = []
+	if emotion:
+		context_parts.append(emotion.get_dynamic_prompt_context())
+	if mood:
+		context_parts.append(mood.get_mood_prompt_line())
+
+	var message := player_text
+	if not context_parts.is_empty():
+		message = "\n".join(context_parts) + "\n" + player_text
 
 	if _needs_reset:
 		_needs_reset = false
 		backend.reset()
 		# LocalBackend는 reset() 후 한 프레임이 필요하므로 deferred 호출
-		call_deferred("_do_say", player_text)
+		call_deferred("_do_say", message)
 		return
 
-	backend.say(player_text)
+	backend.say(message)
 
-func _do_say(player_text: String) -> void:
-	backend.say(player_text)
+func _do_say(message: String) -> void:
+	backend.say(message)
 
 ## 응답 완료 시 전체 텍스트를 검열하고 통과한 경우에만 emit
 func _on_response_finished(full_text: String) -> void:
 	var processed_text := _strip_emoji(_strip_thinking(full_text))
 
-	if emotion:
+	var has_emotion := emotion != null
+	if has_emotion:
 		processed_text = emotion.extract_and_apply(processed_text)
 	if mood:
 		processed_text = mood.extract_and_apply(processed_text)
 	if action:
 		processed_text = action.extract_and_apply(processed_text)
-	if emotion:
+	if has_emotion:
 		emotion.tick()
 
 	if guardrail:

@@ -14,6 +14,8 @@ func _ready() -> void:
 		_lower_keywords.append(keyword.to_lower())
 
 func check(text: String) -> String:
+	if _lower_keywords.is_empty():
+		return text
 	var lower_text := text.to_lower()
 	for keyword in _lower_keywords:
 		if lower_text.contains(keyword):

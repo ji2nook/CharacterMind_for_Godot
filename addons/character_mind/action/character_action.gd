@@ -1,25 +1,78 @@
 extends Node
 class_name CharacterAction
 
-## 이 캐릭터가 호출할 수 있는 액션 이름 목록 (인스펙터에서 캐릭터별로 다르게 설정)
-@export var available_actions: Array[String] = []
+## 이 캐릭터가 호출할 수 있는 액션 정의 목록 (인스펙터에서 캐릭터별로 설정)
+@export var actions: Array[CharacterActionDef] = []
 
-signal action_triggered(action_name: String)
+## action_id와 파싱된 파라미터 딕셔너리를 함께 전달
+signal action_triggered(action_id: String, params: Dictionary)
 
-## AI 응답에서 [ACTION ###] 태그를 찾아 시그널로 발신하고 태그 제거
+var _regex: RegEx
+var _instruction_cache: String = ""
+var _instruction_dirty: bool = true
+
+func _ready() -> void:
+	_regex = RegEx.new()
+	# [ACTION action_id] 또는 [ACTION action_id key=val key2=val2] 형식을 모두 허용
+	_regex.compile("\\[ACTION (\\w+)(?:\\s+([^\\]]*?))?\\]")
+
+## AI 응답에서 [ACTION ...] 태그를 찾아 시그널로 발신하고 태그 제거
 func extract_and_apply(raw_text: String) -> String:
-	var regex := RegEx.new()
-	regex.compile("\\[ACTION ([a-zA-Z_]+)\\]")
-	var result := regex.search(raw_text)
+	var result := _regex.search(raw_text)
 	if result:
-		var action_name := result.get_string(1)
-		if action_name in available_actions and action_name != "none":
-			action_triggered.emit(action_name)
+		var action_id := result.get_string(1)
+		var action_def := _find_action(action_id)
+		if action_def and action_def.enabled:
+			action_triggered.emit(action_id, _parse_params(result.get_string(2)))
 		return raw_text.replace(result.get_string(0), "").strip_edges()
 	return raw_text
 
+## 런타임에 특정 액션의 활성 상태를 변경 (예: 퀘스트 수주 후 비활성화)
+func set_action_enabled(action_id: String, enabled: bool) -> void:
+	var action_def := _find_action(action_id)
+	if action_def:
+		action_def.enabled = enabled
+		_instruction_dirty = true
+
 func build_action_instruction() -> String:
-	var usable := available_actions.filter(func(a: String) -> bool: return a != "none")
+	if not _instruction_dirty:
+		return _instruction_cache
+	var usable: Array[CharacterActionDef] = actions.filter(
+		func(a: CharacterActionDef) -> bool: return a.enabled and a.action_id != ""
+	)
 	if usable.is_empty():
-		return ""
-	return "\n\n대화 중 다음 행동이 필요하다고 판단되면 답변 마지막 줄에 [ACTION 행동이름] 형식으로 표시해야 해 (필요하지 않으면 표시하지 않음). 사용 가능한 행동: " + ", ".join(usable)
+		_instruction_cache = ""
+		_instruction_dirty = false
+		return _instruction_cache
+	var lines: Array[String] = [
+		"\n\n액션이 필요하다고 판단될 때만 답변 마지막 줄에 태그를 표시해 (불필요하면 생략):"
+	]
+	for action_def in usable:
+		var hint: String
+		if action_def.parameters.is_empty():
+			hint = "[ACTION %s]" % action_def.action_id
+		else:
+			var param_hint := " ".join(
+				action_def.parameters.map(func(p: String) -> String: return "%s=값" % p)
+			)
+			hint = "[ACTION %s %s]" % [action_def.action_id, param_hint]
+		lines.append("- %s: %s → %s" % [action_def.action_id, action_def.description, hint])
+	_instruction_cache = "\n".join(lines)
+	_instruction_dirty = false
+	return _instruction_cache
+
+func _find_action(action_id: String) -> CharacterActionDef:
+	for action_def in actions:
+		if action_def.action_id == action_id:
+			return action_def
+	return null
+
+func _parse_params(params_str: String) -> Dictionary:
+	var params: Dictionary = {}
+	if params_str == "":
+		return params
+	for pair in params_str.strip_edges().split(" "):
+		var kv := pair.split("=")
+		if kv.size() == 2 and kv[0] != "" and kv[1] != "":
+			params[kv[0]] = kv[1]
+	return params

@@ -4,7 +4,7 @@ class_name CharacterAIConfig
 # --- 기본 설정 (프롬프트, 무작위성) ---
 # 모델 경로는 씬의 NobodyWhoModel 노드에서 직접 설정
 ## 초기 시스템 프롬프트
-@export var system_prompt: String = "당신은 게임 속 NPC입니다."
+@export var system_prompt: String = "너는 게임 속 NPC야. 답변은 2~3문장으로 짧고 자연스럽게 유지해."
 ## 응답의 무작위성 (작을수록 일관되고 예측 가능한 답변)
 @export var temperature: float = 0.6
 ## 로컬 Qwen3 모델 사용 시 true로 설정 — /no_think 지시어를 시스템 프롬프트에 추가
@@ -12,7 +12,7 @@ class_name CharacterAIConfig
 ## 캐릭터의 기본 프로필
 @export var profile: CharacterProfile
 ## 금지 키워드
-@export var forbidden_topics: Array[String] = ["폭력", "정치", "혐오 발언"]
+@export var forbidden_topics: Array[String] = ["정치", "혐오 발언"]
 
 var _cached_prompt: String = ""
 var _prompt_dirty: bool = true

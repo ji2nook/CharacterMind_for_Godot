@@ -47,7 +47,7 @@ func _ready() -> void:
 	_scrollbar = chat_log.get_v_scroll_bar()
 	set_process(false)
 	send_button.pressed.connect(_on_send_pressed)
-	input_box.text_submitted.connect(func(_t): _on_send_pressed())
+	input_box.text_submitted.connect(_on_send_pressed)
 	npc_chat.response_token.connect(_on_response_token)
 	npc_chat.response_received.connect(_on_response_received)
 	npc_chat.guardrail_blocked.connect(_on_guardrail_blocked)
@@ -124,7 +124,7 @@ func _format_with_actions(text: String) -> String:
 	return _action_regex.sub(text, "[i][color=#aaaaaa]$1[/color][/i]", true)
 
 ## 입력창의 텍스트를 채팅 로그에 표시하고 NPC에게 메시지 전달
-func _on_send_pressed() -> void:
+func _on_send_pressed(_submitted_text: String = "") -> void:
 	var msg: String = input_box.text.strip_edges()
 	if msg == "":
 		return
@@ -170,12 +170,11 @@ func _tokenize_response(text: String) -> Array[String]:
 
 func _split_words(text: String, out: Array[String]) -> void:
 	var words := text.split(" ")
+	var last := words.size() - 1
 	for i in range(words.size()):
-		var word: String = words[i]
-		if i < words.size() - 1:
-			word += " "
-		if word != "":
-			out.append(word)
+		if words[i] == "":
+			continue
+		out.append(words[i] + " " if i < last else words[i])
 
 ## 가드레일 차단 시 fallback을 큐에 추가
 func _on_guardrail_blocked(fallback: String) -> void:
@@ -213,8 +212,8 @@ func _on_stage_changed(stage: String) -> void:
 	_chat_log_content += entry
 	chat_log.append_text(entry)
 
-func _on_action_triggered(action_name: String) -> void:
-	print("액션 발동: ", action_name)
+func _on_action_triggered(action_id: String, params: Dictionary) -> void:
+	print("액션 발동: ", action_id, " / 파라미터: ", params)
 
 ## 백엔드 오류 시 생각 중 애니메이션을 멈추고 오류 메시지를 채팅 로그에 표시
 func _on_request_failed(message: String) -> void:

@@ -15,9 +15,11 @@ const _MAX_RETRIES: int = 3
 ## 최후 수단 — Inspector에 직접 입력 시 커밋 전 반드시 비울 것
 @export var api_key: String = ""
 ## 사용할 모델 ID
-@export var model: String = "openai/gpt-oss-20b:free"
-## 최대 응답 토큰 수
-@export var max_tokens: int = 400
+@export var model: String = "google/gemma-4-26b-a4b-it:free"
+## 최대 응답 토큰 수.
+## 에러 로그에 finish_reason=length가 뜨면 이 값을 높이거나,
+## CharacterAIConfig.system_prompt에 '답변은 2~3문장으로 짧게 유지해' 같은 지시를 추가하세요.
+@export var max_tokens: int = 1200
 
 var _http: HTTPRequest
 ## 성공 확정된 대화만 보관 — 재시도 중에는 추가하지 않는다
@@ -70,7 +72,26 @@ func _on_request_completed(
 			request_failed.emit("응답을 해석하지 못했어요. 다시 말을 걸어주세요.")
 			return
 		var data: Dictionary = json.get_data()
-		var reply: String = data["choices"][0]["message"]["content"]
+		var choices: Array = data.get("choices", [])
+		if choices.is_empty():
+			push_error("CloudBackend: 응답에 choices 없음 — %s" % body.get_string_from_utf8())
+			request_failed.emit("응답을 해석하지 못했어요. 다시 말을 걸어주세요.")
+			return
+		var content: Variant = choices[0].get("message", {}).get("content", null)
+		if not content is String:
+			var finish_reason: String = str(choices[0].get("finish_reason", "unknown"))
+			var usage: Dictionary = data.get("usage", {})
+			push_error(
+				"CloudBackend: content null — finish_reason=%s | choices[0]=%s | usage=%s" % [
+					finish_reason, JSON.stringify(choices[0]), JSON.stringify(usage)
+				]
+			)
+			if finish_reason == "length":
+				request_failed.emit("응답이 너무 길어 잘렸어요. 다시 말을 걸어주세요.")
+			else:
+				request_failed.emit("응답을 받지 못했어요. 다시 말을 걸어주세요.")
+			return
+		var reply: String = content
 		_history.append({"role": "user", "content": _last_user_message})
 		_history.append({"role": "assistant", "content": reply})
 		response_finished.emit(reply)

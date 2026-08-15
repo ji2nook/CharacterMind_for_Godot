@@ -22,7 +22,6 @@ model_path = "res://models/qwen3-1.7b-instruct-q4_k_m.gguf"
 
 [node name="LocalBackend" type="Node" parent="." unique_id=100000001]
 script = ExtResource("10_lcbk")
-model_node = NodePath("../SharedModel")
 
 [node name="CloudBackend" type="Node" parent="." unique_id=100000002]
 script = ExtResource("11_clbk")
