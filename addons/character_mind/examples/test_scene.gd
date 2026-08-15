@@ -17,6 +17,7 @@ var current_profile: CharacterProfile
 @onready var input_box = $UI/DialogueScreen/Layout/InputRow/InputBox
 @onready var send_button = $UI/DialogueScreen/Layout/InputRow/SendButton
 @onready var chat_log = $UI/DialogueScreen/Layout/ChatLog
+@onready var status_label = $UI/DialogueScreen/Layout/StatusLabel
 
 # --- 단어 단위 스트리밍 ---
 ## 가드레일을 통과한 단어들을 순서대로 보관하는 큐
@@ -50,6 +51,10 @@ func _ready() -> void:
 	npc_chat.response_token.connect(_on_response_token)
 	npc_chat.response_received.connect(_on_response_received)
 	npc_chat.guardrail_blocked.connect(_on_guardrail_blocked)
+	npc_chat.emotion.emotion_changed.connect(_on_emotion_changed)
+	npc_chat.emotion.stage_changed.connect(_on_stage_changed)
+	npc_chat.mood.mood_changed.connect(_on_mood_changed)
+	npc_chat.action.action_triggered.connect(_on_action_triggered)
 	
 	# 캐릭터 선택 화면이 먼저 보이도록 초기화
 	select_screen.visible = true
@@ -187,3 +192,25 @@ func _on_response_received(_text: String) -> void:
 ## 스크롤바를 최하단으로 이동해 최신 메시지가 보이게 함
 func _scroll_to_bottom() -> void:
 	_scrollbar.value = _scrollbar.max_value
+
+func _on_emotion_changed(affection: int, trust: int) -> void:
+	status_label.text = "호감도: %d / 신뢰도: %d | 단계: %s | 감정: %s(%d)" % [
+		affection, trust,
+		npc_chat.emotion.get_stage_name(),
+		npc_chat.mood.current_label, npc_chat.mood.current_intensity,
+	]
+
+func _on_mood_changed(label: String, intensity: int) -> void:
+	status_label.text = "호감도: %d / 신뢰도: %d | 단계: %s | 감정: %s(%d)" % [
+		npc_chat.emotion.affection, npc_chat.emotion.trust,
+		npc_chat.emotion.get_stage_name(),
+		label, intensity,
+	]
+
+func _on_stage_changed(stage: String) -> void:
+	var entry := "\n[color=#ffdd88][i]— 관계 단계 변화: %s —[/i][/color]\n" % stage
+	_chat_log_content += entry
+	chat_log.append_text(entry)
+
+func _on_action_triggered(action_name: String) -> void:
+	print("액션 발동: ", action_name)

@@ -6,6 +6,9 @@
 [ext_resource type="Resource" uid="uid://mi2ci8u7ydbq" path="res://addons/character_mind/examples/characters/bob_profile.tres" id="3_nweab"]
 [ext_resource type="Resource" uid="uid://cst8a47atlbmv" path="res://addons/character_mind/config/test_config.tres" id="3_psu8r"]
 [ext_resource type="Script" uid="uid://ck487qvgluc6g" path="res://addons/character_mind/guardrail/character_guardrail.gd" id="4_ua7wq"]
+[ext_resource type="Script" uid="uid://dfhnjlxln86tb" path="res://addons/character_mind/emotion/character_emotion.gd" id="7_mjcgp"]
+[ext_resource type="Script" uid="uid://nj3ouquaiuwh" path="res://addons/character_mind/emotion/character_mood.gd" id="8_ywup8"]
+[ext_resource type="Script" uid="uid://d2yljhten070k" path="res://addons/character_mind/action/character_action.gd" id="9_5kfdt"]
 
 [node name="TestScene" type="Node" unique_id=197752086]
 script = ExtResource("1_s118h")
@@ -14,19 +17,33 @@ bob_profile = ExtResource("3_nweab")
 
 [node name="SharedModel" type="NobodyWhoModel" parent="." unique_id=740376170]
 model_path = "res://models/Qwen3-0.6B-Q8_0.gguf"
-n_ctx = 2048
 
-[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "model_node")]
+[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "model_node", "emotion", "mood", "action")]
 script = ExtResource("2_psu8r")
 config = ExtResource("3_psu8r")
 guardrail = NodePath("Guardrail")
 model_node = NodePath("../SharedModel")
+emotion = NodePath("Emotion")
+mood = NodePath("Mood")
+action = NodePath("Action")
 metadata/_custom_type_script = "uid://c6v3cqah74xt4"
 
 [node name="Guardrail" type="Node" parent="NPCChat" unique_id=1585572361]
 script = ExtResource("4_ua7wq")
 blocked_keywords = Array[String](["금지어1", "금지어2"])
 metadata/_custom_type_script = "uid://ck487qvgluc6g"
+
+[node name="Emotion" type="Node" parent="NPCChat" unique_id=1321302597]
+script = ExtResource("7_mjcgp")
+metadata/_custom_type_script = "uid://dfhnjlxln86tb"
+
+[node name="Mood" type="Node" parent="NPCChat" unique_id=814087632]
+script = ExtResource("8_ywup8")
+metadata/_custom_type_script = "uid://nj3ouquaiuwh"
+
+[node name="Action" type="Node" parent="NPCChat" unique_id=518975048]
+script = ExtResource("9_5kfdt")
+metadata/_custom_type_script = "uid://d2yljhten070k"
 
 [node name="UI" type="Control" parent="." unique_id=1265819672]
 layout_mode = 3
@@ -71,6 +88,10 @@ text = "전송"
 [node name="ExitButton" type="Button" parent="UI/DialogueScreen/Layout" unique_id=1664437213]
 layout_mode = 2
 text = "캐릭터 선택으로 돌아가기"
+
+[node name="StatusLabel" type="Label" parent="UI/DialogueScreen/Layout" unique_id=1404175741]
+layout_mode = 2
+text = "호감도: # / 신뢰도 : #"
 
 [node name="SelectScreen" type="Control" parent="UI" unique_id=410505641]
 layout_mode = 1

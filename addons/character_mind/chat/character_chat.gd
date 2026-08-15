@@ -16,6 +16,13 @@ signal guardrail_blocked(fallback: String)
 @export var guardrail: CharacterGuardrail
 ## 추론을 실행할 NobodyWho 모델 노드
 @export var model_node: NobodyWhoModel
+## 캐릭터의 플레이어에 대한 감정 노드
+@export var emotion: CharacterEmotion
+## 캐릭터의 현재 감정 상태 노드
+@export var mood: CharacterMood
+## 캐릭터 액션 노드
+@export var action: CharacterAction
+
 
 # --- 내부 상태 ---
 var _chat: NobodyWhoChat
@@ -47,16 +54,32 @@ func switch_character(new_profile: CharacterProfile) -> void:
 	config.profile = new_profile
 	config.mark_dirty()
 	_needs_reset = true
+	if emotion and new_profile:
+		emotion.reset_to(new_profile.initial_affection, new_profile.initial_trust)
+	if mood:
+		mood.current_label = "NEUTRAL"
+		mood.current_intensity = 1
+		mood.mood_changed.emit(mood.current_label, mood.current_intensity)
 
 ## 플레이어 메시지를 NobodyWho 채팅에 전달
 func send_message(player_text: String) -> void:
+	var system_text := config.build_safe_system_prompt()
+	if emotion:
+		system_text += "\n" + emotion.get_dynamic_prompt_context()
+	if mood:
+		system_text += "\n" + mood.get_mood_prompt_line()
+	if action:
+		system_text += action.build_action_instruction()
+	
 	if _needs_reset:
 		_needs_reset = false
 		_setup_chat()
+		_chat.system_prompt = system_text
 		# 새 NobodyWhoChat이 model_node 연결을 마칠 수 있도록 한 프레임 뒤에 say() 호출
 		call_deferred("_do_say", player_text)
 		return
-	_chat.system_prompt = config.build_safe_system_prompt()
+	
+	_chat.system_prompt = system_text
 	_chat.say(player_text)
 
 func _do_say(player_text: String) -> void:
@@ -67,17 +90,28 @@ func _on_response_updated(_token: String) -> void:
 
 ## 응답 완료 시 전체 텍스트를 검열하고 통과한 경우에만 emit
 func _on_response_finished(full_text: String) -> void:
-	var clean_text := _strip_emoji(_strip_thinking(full_text))
+	var processed_text := _strip_emoji(_strip_thinking(full_text))
+	
+	if emotion:
+		processed_text = emotion.extract_and_apply(processed_text)
+	if mood:
+		processed_text = mood.extract_and_apply(processed_text)
+	if action:
+		processed_text = action.extract_and_apply(processed_text)
+	if emotion:
+		emotion.tick()
+
 	if guardrail:
-		var result := guardrail.check(clean_text)
-		if result != clean_text:
+		var result := guardrail.check(processed_text)
+		if result != processed_text:
 			_needs_reset = true
 			guardrail_blocked.emit(result)
 			response_received.emit(result)
 			return
-	if clean_text != "":
-		response_token.emit(clean_text)
-	response_received.emit(clean_text)
+		
+	if processed_text != "":
+		response_token.emit(processed_text)
+	response_received.emit(processed_text)
 
 func _strip_emoji(text: String) -> String:
 	return _emoji_regex.sub(text, "", true)
