@@ -9,6 +9,8 @@
 [ext_resource type="Script" uid="uid://dfhnjlxln86tb" path="res://addons/character_mind/emotion/character_emotion.gd" id="7_mjcgp"]
 [ext_resource type="Script" uid="uid://nj3ouquaiuwh" path="res://addons/character_mind/emotion/character_mood.gd" id="8_ywup8"]
 [ext_resource type="Script" uid="uid://d2yljhten070k" path="res://addons/character_mind/action/character_action.gd" id="9_5kfdt"]
+[ext_resource type="Script" uid="uid://jk6jwiht2xhx" path="res://addons/character_mind/backend/local_backend.gd" id="10_lcbk"]
+[ext_resource type="Script" uid="uid://1p130lnn5c7n" path="res://addons/character_mind/backend/cloud_backend.gd" id="11_clbk"]
 
 [node name="TestScene" type="Node" unique_id=197752086]
 script = ExtResource("1_s118h")
@@ -16,13 +18,20 @@ alice_profile = ExtResource("2_k0n7s")
 bob_profile = ExtResource("3_nweab")
 
 [node name="SharedModel" type="NobodyWhoModel" parent="." unique_id=740376170]
-model_path = "res://models/Qwen3-0.6B-Q8_0.gguf"
+model_path = "res://models/qwen3-1.7b-instruct-q4_k_m.gguf"
 
-[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "model_node", "emotion", "mood", "action")]
+[node name="LocalBackend" type="Node" parent="." unique_id=100000001]
+script = ExtResource("10_lcbk")
+model_node = NodePath("../SharedModel")
+
+[node name="CloudBackend" type="Node" parent="." unique_id=100000002]
+script = ExtResource("11_clbk")
+
+[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "backend", "emotion", "mood", "action")]
 script = ExtResource("2_psu8r")
 config = ExtResource("3_psu8r")
 guardrail = NodePath("Guardrail")
-model_node = NodePath("../SharedModel")
+backend = NodePath("../CloudBackend")
 emotion = NodePath("Emotion")
 mood = NodePath("Mood")
 action = NodePath("Action")

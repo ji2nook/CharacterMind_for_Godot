@@ -7,6 +7,9 @@
 # NobodyWho 바이너리 (AssetLib에서 직접 설치)
 addons/nobodywho/
 
+# API 키 파일 (api_keys.cfg.example을 복사해 사용)
+api_keys.cfg
+
 # 개발 내부 문서
 CLAUDE.md
 DEVELOPMENT_GUIDE.md

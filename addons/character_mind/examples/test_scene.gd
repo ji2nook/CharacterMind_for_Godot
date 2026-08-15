@@ -51,6 +51,7 @@ func _ready() -> void:
 	npc_chat.response_token.connect(_on_response_token)
 	npc_chat.response_received.connect(_on_response_received)
 	npc_chat.guardrail_blocked.connect(_on_guardrail_blocked)
+	npc_chat.request_failed.connect(_on_request_failed)
 	npc_chat.emotion.emotion_changed.connect(_on_emotion_changed)
 	npc_chat.emotion.stage_changed.connect(_on_stage_changed)
 	npc_chat.mood.mood_changed.connect(_on_mood_changed)
@@ -214,3 +215,10 @@ func _on_stage_changed(stage: String) -> void:
 
 func _on_action_triggered(action_name: String) -> void:
 	print("액션 발동: ", action_name)
+
+## 백엔드 오류 시 생각 중 애니메이션을 멈추고 오류 메시지를 채팅 로그에 표시
+func _on_request_failed(message: String) -> void:
+	_stop_thinking()
+	var entry := "\n[color=#ff8888][i]— %s —[/i][/color]\n" % message
+	_chat_log_content += entry
+	chat_log.append_text(entry)
