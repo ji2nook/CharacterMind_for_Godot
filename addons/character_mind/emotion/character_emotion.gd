@@ -32,7 +32,8 @@ func reset_to(new_affection: int, new_trust: int) -> void:
 ## 수익 체감: WARM(30+) 이상에서 LLM이 +2를 내려도 +1로 코드 단에서 제한
 func extract_and_apply(raw_text: String) -> String:
 	var regex := RegEx.new()
-	regex.compile("\\[EMOTION affection=([+-]?\\d+) trust=([+-]?\\d+)\\]")
+	# 대소문자, 콜론, 쉼표 등 모델마다 다른 출력 형식을 허용
+	regex.compile("(?i)\\[EMOTION:?\\s*affection=([+-]?\\d+)[,\\s]+trust=([+-]?\\d+)\\]")
 	var result := regex.search(raw_text)
 	if result:
 		var affection_delta := int(result.get_string(1))

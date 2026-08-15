@@ -11,10 +11,11 @@ var current_intensity: int = 1  # 1=약함, 2=보통, 3=강함
 ## intensity는 선택값 — 모델이 생략하면 1로 처리
 func extract_and_apply(raw_text: String) -> String:
 	var regex := RegEx.new()
-	regex.compile("\\[MOOD ([A-Z]+)(?:\\s([1-3]))?\\]")
+	# 대소문자, 콜론, 공백 차이 허용
+	regex.compile("(?i)\\[MOOD:?\\s*([A-Z]+)(?:[\\s,]+([1-3]))?\\]")
 	var result := regex.search(raw_text)
 	if result:
-		var label := result.get_string(1)
+		var label := result.get_string(1).to_upper()
 		var intensity_str := result.get_string(2)
 		if label in LABELS:
 			current_label = label
