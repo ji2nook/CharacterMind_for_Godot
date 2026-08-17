@@ -38,7 +38,10 @@ var _emoji_regex: RegEx
 func _ready() -> void:
 	_emoji_regex = RegEx.new()
 	_emoji_regex.compile("[\\x{1F000}-\\x{1FAFF}\\x{2600}-\\x{27BF}\\x{FE00}-\\x{FEFF}]")
-	backend.system_prompt = config.build_safe_system_prompt()
+	var initial_prompt := config.build_safe_system_prompt()
+	if action:
+		initial_prompt += action.build_action_instruction()
+	backend.system_prompt = initial_prompt
 	backend.response_finished.connect(_on_response_finished)
 	backend.request_failed.connect(request_failed.emit)
 
@@ -67,7 +70,8 @@ func send_message(player_text: String) -> void:
 	var system_text := config.build_safe_system_prompt()
 	if action:
 		system_text += action.build_action_instruction()
-	backend.system_prompt = system_text
+	if system_text != backend.system_prompt:
+		backend.system_prompt = system_text
 
 	# 동적 상태(감정/무드/인식)는 시스템 프롬프트 대신 유저 메시지 앞에 주입
 	# → 시스템 프롬프트가 턴마다 바뀌지 않아 로컬 KV 캐시가 보존됨

@@ -12,7 +12,8 @@ func _ready() -> void:
 	_setup_chat()
 
 func say(message: String) -> void:
-	_chat.system_prompt = system_prompt
+	if _chat.system_prompt != system_prompt:
+		_chat.system_prompt = system_prompt
 	_chat.say(message)
 
 ## 대화 기록을 초기화하고 NobodyWhoChat을 새로 생성한다

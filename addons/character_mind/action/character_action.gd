@@ -16,16 +16,19 @@ func _ready() -> void:
 	# [ACTION action_id] 또는 [ACTION action_id key=val key2=val2] 형식을 모두 허용
 	_regex.compile("\\[ACTION (\\w+)(?:\\s+([^\\]]*?))?\\]")
 
-## AI 응답에서 [ACTION ...] 태그를 찾아 시그널로 발신하고 태그 제거
+## AI 응답에서 [ACTION ...] 태그를 모두 찾아 순서대로 시그널로 발신하고 태그 제거
 func extract_and_apply(raw_text: String) -> String:
-	var result := _regex.search(raw_text)
-	if result:
+	var results := _regex.search_all(raw_text)
+	if results.is_empty():
+		return raw_text
+	var cleaned := raw_text
+	for result in results:
 		var action_id := result.get_string(1)
 		var action_def := _find_action(action_id)
 		if action_def and action_def.enabled:
 			action_triggered.emit(action_id, _parse_params(result.get_string(2)))
-		return raw_text.replace(result.get_string(0), "").strip_edges()
-	return raw_text
+		cleaned = cleaned.replace(result.get_string(0), "")
+	return cleaned.strip_edges()
 
 ## 런타임에 특정 액션의 활성 상태를 변경 (예: 퀘스트 수주 후 비활성화)
 func set_action_enabled(action_id: String, enabled: bool) -> void:

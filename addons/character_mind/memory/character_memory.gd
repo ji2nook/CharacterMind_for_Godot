@@ -4,7 +4,7 @@ class_name CharacterMemory
 @export var max_entries: int = 20
 @export var entries_per_prompt: int = 3
 
-var entries: Array = []
+var entries: Array[Dictionary] = []
 var turn_count: int = 0
 
 signal memory_updated
@@ -23,7 +23,7 @@ func add_entry(text: String, importance: int = 1) -> void:
 func get_relevant_summary(current_message: String) -> String:
 	if entries.is_empty():
 		return ""
-	var scored: Array = []
+	var scored: Array[Dictionary] = []
 	for e in entries:
 		var score := float(e["importance"])
 		for word in current_message.split(" "):
