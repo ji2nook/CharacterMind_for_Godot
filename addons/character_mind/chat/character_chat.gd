@@ -106,6 +106,13 @@ func send_message(player_text: String) -> void:
 func _do_say(message: String, raw_message: String) -> void:
 	backend.say(message, raw_message)
 
+## 앞 30자 패턴이 5회 이상 반복되면 반복 루프로 판단한다
+func _is_repetition_loop(text: String) -> bool:
+	if text.length() < 100:
+		return false
+	var sample := text.substr(0, 30)
+	return text.count(sample) >= 5
+
 ## config + action 조합으로 시스템 프롬프트를 빌드한다
 func _build_system_prompt() -> String:
 	var prompt := config.build_safe_system_prompt()
@@ -115,6 +122,11 @@ func _build_system_prompt() -> String:
 
 ## 응답 완료 시 전체 텍스트를 검열하고 통과한 경우에만 emit
 func _on_response_finished(full_text: String) -> void:
+	if _is_repetition_loop(full_text):
+		_needs_reset = true
+		request_failed.emit("응답 생성 중 오류가 발생했습니다. 다시 시도해주세요.")
+		return
+
 	var processed_text := _strip_emoji(_strip_thinking(full_text))
 
 	var has_emotion := emotion != null

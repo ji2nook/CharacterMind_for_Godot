@@ -20,6 +20,9 @@ const _MAX_RETRIES: int = 3
 ## 에러 로그에 finish_reason=length가 뜨면 이 값을 높이거나,
 ## CharacterAIConfig.system_prompt에 '답변은 2~3문장으로 짧게 유지해' 같은 지시를 추가하세요.
 @export var max_tokens: int = 1200
+## 이미 등장한 토큰의 빈도에 비례해 재등장 확률을 낮춘다 (반복 루프 방지).
+## 0.0이면 비활성, 1.0이 일반적인 권장값. OpenAI 호환 API에서 지원.
+@export var frequency_penalty: float = 0.8
 
 var _http: HTTPRequest
 ## 성공 확정된 대화만 보관 — 재시도 중에는 추가하지 않는다
@@ -29,11 +32,14 @@ var _last_user_message: String = ""
 ## 히스토리 저장용 메시지 (순수 플레이어 텍스트)
 var _last_raw_user_message: String = ""
 var _retry_count: int = 0
+## _ready()에서 한 번만 resolve해 캐싱 — 매 요청마다 파일 I/O를 피한다
+var _api_key_cached: String = ""
 
 func _ready() -> void:
 	_http = HTTPRequest.new()
 	add_child(_http)
 	_http.request_completed.connect(_on_request_completed)
+	_api_key_cached = _resolve_api_key()
 
 func say(message: String, raw_message: String = "") -> void:
 	_last_user_message = message
@@ -54,10 +60,11 @@ func _send_request() -> void:
 		"model": model,
 		"messages": messages,
 		"max_tokens": max_tokens,
+		"frequency_penalty": frequency_penalty,
 	})
 
 	var headers := PackedStringArray([
-		"Authorization: Bearer " + _resolve_api_key(),
+		"Authorization: Bearer " + _api_key_cached,
 		"Content-Type: application/json",
 	])
 
