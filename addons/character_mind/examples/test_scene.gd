@@ -23,7 +23,6 @@ var current_profile: CharacterProfile
 ## 가드레일을 통과한 단어들을 순서대로 보관하는 큐
 var _pending_tokens: Array[String] = []
 var _token_read_idx: int = 0
-var _mutex: Mutex = Mutex.new()
 var _token_timer: float = 0.0
 
 ## 단어 표시 간격 (초) — 낮출수록 빠름, 높일수록 느림
@@ -56,11 +55,11 @@ func _ready() -> void:
 	npc_chat.emotion.stage_changed.connect(_on_stage_changed)
 	npc_chat.mood.mood_changed.connect(_on_mood_changed)
 	npc_chat.action.action_triggered.connect(_on_action_triggered)
-	
+
 	# 캐릭터 선택 화면이 먼저 보이도록 초기화
 	select_screen.visible = true
 	dialogue_screen.visible = false
-	
+
 	alice_button.pressed.connect(func(): _start_conversation(alice_profile))
 	bob_button.pressed.connect(func(): _start_conversation(bob_profile))
 	exit_button.pressed.connect(_end_conversation)
@@ -78,6 +77,7 @@ func _start_conversation(profile: CharacterProfile) -> void:
 	_is_thinking = false
 	_thinking_timer = 0.0
 	_thinking_dot_count = 1
+	_set_input_enabled(true)
 	select_screen.visible = false
 	dialogue_screen.visible = true
 
@@ -105,16 +105,13 @@ func _process(delta: float) -> void:
 	if _token_timer < TOKEN_INTERVAL:
 		return
 	_token_timer = 0.0
-	_mutex.lock()
 	if _token_read_idx >= _pending_tokens.size():
-		_mutex.unlock()
 		return
 	var token: String = _pending_tokens[_token_read_idx]
 	_token_read_idx += 1
 	if _token_read_idx >= _pending_tokens.size():
 		_pending_tokens.clear()
 		_token_read_idx = 0
-	_mutex.unlock()
 	_chat_log_content += token
 	chat_log.append_text(token)
 	_scroll_to_bottom()
@@ -137,6 +134,7 @@ func _on_send_pressed(_submitted_text: String = "") -> void:
 	set_process(true)
 	chat_log.append_text("[i]생각 중.[/i]")
 	input_box.text = ""
+	_set_input_enabled(false)
 	npc_chat.send_message(msg)
 	_scroll_to_bottom()
 
@@ -150,11 +148,8 @@ func _stop_thinking() -> void:
 ## 응답 텍스트를 일반 구간과 *(행동)* 구간으로 분리해 토큰 큐에 추가
 ## 행동 구간은 BBCode로 감싸 기울임·회색으로 표시
 func _on_response_token(token: String) -> void:
-	_stop_thinking()
-	_mutex.lock()
 	for t in _tokenize_response(token):
 		_pending_tokens.append(t)
-	_mutex.unlock()
 
 func _tokenize_response(text: String) -> Array[String]:
 	var result: Array[String] = []
@@ -179,15 +174,13 @@ func _split_words(text: String, out: Array[String]) -> void:
 ## 가드레일 차단 시 fallback을 큐에 추가
 func _on_guardrail_blocked(fallback: String) -> void:
 	_stop_thinking()
-	_mutex.lock()
 	_pending_tokens.append(fallback)
-	_mutex.unlock()
 
-## 응답 완료 시 줄바꿈을 큐에 추가해 다음 발화와 구분
+## 응답 완료 시 thinking을 종료하고 줄바꿈을 큐에 추가해 다음 발화와 구분하고 입력을 재활성화
 func _on_response_received(_text: String) -> void:
-	_mutex.lock()
+	_stop_thinking()
 	_pending_tokens.append("\n")
-	_mutex.unlock()
+	_set_input_enabled(true)
 
 ## 스크롤바를 최하단으로 이동해 최신 메시지가 보이게 함
 func _scroll_to_bottom() -> void:
@@ -221,3 +214,9 @@ func _on_request_failed(message: String) -> void:
 	var entry := "\n[color=#ff8888][i]— %s —[/i][/color]\n" % message
 	_chat_log_content += entry
 	chat_log.append_text(entry)
+	_set_input_enabled(true)
+
+## 전송 버튼과 입력창의 활성 상태를 일괄 전환
+func _set_input_enabled(enabled: bool) -> void:
+	send_button.disabled = not enabled
+	input_box.editable = enabled
