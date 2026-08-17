@@ -60,6 +60,7 @@ func build_safe_system_prompt() -> String:
 	if profile:
 		parts.append(profile.build_persona_prompt())
 	parts.append("행동이나 감정 표현은 *(행동)* 형식으로 써. 예: *(웃으며)* 안녕!")
+	parts.append("기본적으로 유저가 사용한 언어로 답변하되, 캐릭터 설정에 특정 언어나 말투가 명시되어 있으면 그에 따라.")
 	if not forbidden_topics.is_empty():
 		parts.append("다음 주제가 나오면 캐릭터답게 자연스럽게 화제를 돌려: " + ", ".join(forbidden_topics))
 	_cached_prompt = "\n\n".join(parts) + build_emotion_instruction() + build_mood_instruction()
