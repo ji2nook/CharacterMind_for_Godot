@@ -98,13 +98,13 @@ func send_message(player_text: String) -> void:
 		_needs_reset = false
 		backend.reset()
 		# LocalBackend는 reset() 후 한 프레임이 필요하므로 deferred 호출
-		call_deferred("_do_say", message)
+		call_deferred("_do_say", message, player_text)
 		return
 
-	backend.say(message)
+	backend.say(message, player_text)
 
-func _do_say(message: String) -> void:
-	backend.say(message)
+func _do_say(message: String, raw_message: String) -> void:
+	backend.say(message, raw_message)
 
 ## config + action 조합으로 시스템 프롬프트를 빌드한다
 func _build_system_prompt() -> String:

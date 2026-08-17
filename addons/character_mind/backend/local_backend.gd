@@ -11,7 +11,7 @@ var _chat: NobodyWhoChat
 func _ready() -> void:
 	_setup_chat()
 
-func say(message: String) -> void:
+func say(message: String, _raw_message: String = "") -> void:
 	if _chat.system_prompt != system_prompt:
 		_chat.system_prompt = system_prompt
 	_chat.say(message)

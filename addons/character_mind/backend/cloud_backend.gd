@@ -24,7 +24,10 @@ const _MAX_RETRIES: int = 3
 var _http: HTTPRequest
 ## 성공 확정된 대화만 보관 — 재시도 중에는 추가하지 않는다
 var _history: Array[Dictionary] = []
+## API 전송용 메시지 (컨텍스트 포함)
 var _last_user_message: String = ""
+## 히스토리 저장용 메시지 (순수 플레이어 텍스트)
+var _last_raw_user_message: String = ""
 var _retry_count: int = 0
 
 func _ready() -> void:
@@ -32,8 +35,9 @@ func _ready() -> void:
 	add_child(_http)
 	_http.request_completed.connect(_on_request_completed)
 
-func say(message: String) -> void:
+func say(message: String, raw_message: String = "") -> void:
 	_last_user_message = message
+	_last_raw_user_message = raw_message if raw_message != "" else message
 	_retry_count = 0
 	_send_request()
 
@@ -92,7 +96,9 @@ func _on_request_completed(
 				request_failed.emit("응답을 받지 못했어요. 다시 말을 걸어주세요.")
 			return
 		var reply: String = content
-		_history.append({"role": "user", "content": _last_user_message})
+		# 히스토리에는 컨텍스트 없는 순수 플레이어 텍스트만 저장
+		# → 이전 턴의 감정상태·기억·로어가 히스토리에 누적되어 토큰 낭비·AI 혼선을 일으키지 않는다
+		_history.append({"role": "user", "content": _last_raw_user_message})
 		_history.append({"role": "assistant", "content": reply})
 		response_finished.emit(reply)
 		return

@@ -12,7 +12,8 @@ signal request_failed(message: String)
 var system_prompt: String = ""
 
 ## 메시지를 전송하고 응답을 요청한다
-func say(_message: String) -> void:
+## _raw_message: 히스토리 저장용 순수 플레이어 텍스트 — 컨텍스트를 제외한 원문
+func say(_message: String, _raw_message: String = "") -> void:
 	pass
 
 ## 대화 기록을 초기화한다 (캐릭터 전환 등)
