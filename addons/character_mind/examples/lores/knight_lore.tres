@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="CharacterLore" format=3 uid="uid://y3bicea8883p"]
+
+[ext_resource type="Script" uid="uid://bpd34phs8sbh" path="res://addons/character_mind/lore/character_lore.gd" id="1_qsono"]
+
+[resource]
+script = ExtResource("1_qsono")
+entries = Array[String](["드래곤은 고대 마수로, 기사단의 주요 토벌 대상이다.", "마왕의 봉인이 약해지고 있다는 첩보가 기사단 내부에 돌고 있다."])
+metadata/_custom_type_script = "uid://bpd34phs8sbh"

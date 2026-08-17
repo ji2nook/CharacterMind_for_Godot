@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="CharacterLore" format=3 uid="uid://bbua2pm62iw7v"]
+
+[ext_resource type="Script" uid="uid://bpd34phs8sbh" path="res://addons/character_mind/lore/character_lore.gd" id="1_v5f2t"]
+
+[resource]
+script = ExtResource("1_v5f2t")
+entries = Array[String](["아스카 왕국은 호수 평원에 자리한 나라다.", "오크베일은 아스카 왕국 동쪽 끝에 위치한 한적한 시골 마을이다.", "오크베일 주민들은 매년 봄 풍요를 기원하는 하베스트 축제를 연다."])
+metadata/_custom_type_script = "uid://bpd34phs8sbh"

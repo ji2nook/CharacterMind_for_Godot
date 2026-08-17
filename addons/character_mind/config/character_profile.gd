@@ -22,6 +22,9 @@ class_name CharacterProfile
 @export var likes: Array[String] = []
 @export var dislikes: Array[String] = []
 
+## 해당 캐릭터만 알고 있는 개인 지식 (직업/신분 특화 정보 등)
+@export var lore: CharacterLore
+
 @export_group("관계 초기값")
 @export var initial_affection: int = 0
 @export var initial_trust: int = 0

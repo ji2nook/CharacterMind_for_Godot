@@ -38,10 +38,7 @@ var _emoji_regex: RegEx
 func _ready() -> void:
 	_emoji_regex = RegEx.new()
 	_emoji_regex.compile("[\\x{1F000}-\\x{1FAFF}\\x{2600}-\\x{27BF}\\x{FE00}-\\x{FEFF}]")
-	var initial_prompt := config.build_safe_system_prompt()
-	if action:
-		initial_prompt += action.build_action_instruction()
-	backend.system_prompt = initial_prompt
+	backend.system_prompt = _build_system_prompt()
 	backend.response_finished.connect(_on_response_finished)
 	backend.request_failed.connect(request_failed.emit)
 
@@ -67,9 +64,7 @@ func send_message(player_text: String) -> void:
 			response_received.emit(checked)
 			return
 
-	var system_text := config.build_safe_system_prompt()
-	if action:
-		system_text += action.build_action_instruction()
+	var system_text := _build_system_prompt()
 	if system_text != backend.system_prompt:
 		backend.system_prompt = system_text
 
@@ -82,8 +77,18 @@ func send_message(player_text: String) -> void:
 		context_parts.append(mood.get_mood_prompt_line())
 	if perception:
 		context_parts.append(perception.build_context_line())
-	if memory and memory.entries.size() > 0:
-		context_parts.append("관련 기억:\n- " + memory.get_relevant_summary(player_text))
+	if memory:
+		var summary := memory.get_relevant_summary(player_text)
+		if summary != "":
+			context_parts.append("관련 기억:\n- " + summary)
+	if config.shared_lore:
+		var shared := config.shared_lore.get_relevant_lore(player_text)
+		if shared != "":
+			context_parts.append("세계관 공통 설정:\n- " + shared)
+	if config.profile and config.profile.lore:
+		var personal: String = config.profile.lore.get_relevant_lore(player_text)
+		if personal != "":
+			context_parts.append("이 캐릭터가 아는 정보:\n- " + personal)
 
 	var message := player_text
 	if not context_parts.is_empty():
@@ -100,6 +105,13 @@ func send_message(player_text: String) -> void:
 
 func _do_say(message: String) -> void:
 	backend.say(message)
+
+## config + action 조합으로 시스템 프롬프트를 빌드한다
+func _build_system_prompt() -> String:
+	var prompt := config.build_safe_system_prompt()
+	if action:
+		prompt += action.build_action_instruction()
+	return prompt
 
 ## 응답 완료 시 전체 텍스트를 검열하고 통과한 경우에만 emit
 func _on_response_finished(full_text: String) -> void:

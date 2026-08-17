@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="CharacterProfile" format=3 uid="uid://mi2ci8u7ydbq"]
 
+[ext_resource type="Resource" uid="uid://y3bicea8883p" path="res://addons/character_mind/examples/lores/knight_lore.tres" id="1_hngmb"]
 [ext_resource type="Script" uid="uid://c8ml40ml7p3np" path="res://addons/character_mind/config/character_profile.gd" id="1_ndan2"]
 
 [resource]
@@ -16,6 +17,7 @@ speech_style = "퉁명스러운 듯하지만 은근히 주변 사람을 챙긴�
 backstory = "젊었을 때 대도시에서 군용 장비를 설계하던 엘리트 수석 기술자였으나, 자신이 만들어낸 병기가 무고한 이들을 해치는 것에 환멸을 느끼고 직책을 내려놓게 되었다. 조용하고 한적한 시골 마을에 정착하여 모험가에게 필요한 방어구와 무기를 만드는 대장장이 일을 시작하게 되었다."
 likes = Array[String](["부지런한 사람", "광석", "고기 요리"])
 dislikes = Array[String](["권력 싸움", "화려한 장신구", "허세"])
+lore = ExtResource("1_hngmb")
 initial_affection = 10
 initial_trust = 15
 example_dialogues = Array[String](["안녕하세요.", "...응.", "이 검 좀 수리해주실 수 있을까요?", "놔봐. *(검을 잠시 살핀다)* 사흘.", "예전에 다른 일 하셨다고요?", "...옛날 얘기다. 필요한 거나 말해."])

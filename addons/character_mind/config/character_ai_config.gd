@@ -11,6 +11,8 @@ class_name CharacterAIConfig
 @export var qwen3_mode: bool = false
 ## 캐릭터의 기본 프로필
 @export var profile: CharacterProfile
+## 모든 캐릭터가 공유하는 세계관 공통 설정 (여러 NPC가 동일한 내용을 공유)
+@export var shared_lore: CharacterLore
 ## 금지 키워드
 @export var forbidden_topics: Array[String] = ["정치", "혐오 발언"]
 
