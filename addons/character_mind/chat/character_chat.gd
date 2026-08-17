@@ -24,6 +24,8 @@ signal request_failed(message: String)
 @export var mood: CharacterMood
 ## 캐릭터 액션 노드
 @export var action: CharacterAction
+## 게임 세계의 현재 상태(시간대, 위치, 최근 이벤트)를 제공하는 인식 노드
+@export var perception: CharacterPerception
 
 
 # --- 내부 상태 ---
@@ -64,13 +66,15 @@ func send_message(player_text: String) -> void:
 		system_text += action.build_action_instruction()
 	backend.system_prompt = system_text
 
-	# 동적 상태(감정/무드)는 시스템 프롬프트 대신 유저 메시지 앞에 주입
+	# 동적 상태(감정/무드/인식)는 시스템 프롬프트 대신 유저 메시지 앞에 주입
 	# → 시스템 프롬프트가 턴마다 바뀌지 않아 로컬 KV 캐시가 보존됨
 	var context_parts: Array[String] = []
 	if emotion:
 		context_parts.append(emotion.get_dynamic_prompt_context())
 	if mood:
 		context_parts.append(mood.get_mood_prompt_line())
+	if perception:
+		context_parts.append(perception.build_context_line())
 
 	var message := player_text
 	if not context_parts.is_empty():
