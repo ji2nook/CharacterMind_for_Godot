@@ -26,6 +26,8 @@ signal request_failed(message: String)
 @export var action: CharacterAction
 ## 게임 세계의 현재 상태(시간대, 위치, 최근 이벤트)를 제공하는 인식 노드
 @export var perception: CharacterPerception
+## 대화 중 중요 정보를 저장하고 관련도 기반으로 검색하는 기억 노드
+@export var memory: CharacterMemory
 
 
 # --- 내부 상태 ---
@@ -39,6 +41,7 @@ func _ready() -> void:
 	backend.system_prompt = config.build_safe_system_prompt()
 	backend.response_finished.connect(_on_response_finished)
 	backend.request_failed.connect(request_failed.emit)
+
 
 ## 대화 상대를 다른 캐릭터로 전환
 func switch_character(new_profile: CharacterProfile) -> void:
@@ -75,6 +78,8 @@ func send_message(player_text: String) -> void:
 		context_parts.append(mood.get_mood_prompt_line())
 	if perception:
 		context_parts.append(perception.build_context_line())
+	if memory and memory.entries.size() > 0:
+		context_parts.append("관련 기억:\n- " + memory.get_relevant_summary(player_text))
 
 	var message := player_text
 	if not context_parts.is_empty():

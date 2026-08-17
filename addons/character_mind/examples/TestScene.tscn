@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://jk6jwiht2xhx" path="res://addons/character_mind/backend/local_backend.gd" id="10_lcbk"]
 [ext_resource type="Script" uid="uid://1p130lnn5c7n" path="res://addons/character_mind/backend/cloud_backend.gd" id="11_clbk"]
 [ext_resource type="Script" uid="uid://q0khf86xab5" path="res://addons/character_mind/perception/character_perception.gd" id="12_se0ky"]
+[ext_resource type="Script" uid="uid://6j1emyfqlp7k" path="res://addons/character_mind/memory/character_memory.gd" id="13_4lh2r"]
 
 [node name="TestScene" type="Node" unique_id=197752086]
 script = ExtResource("1_s118h")
@@ -27,7 +28,7 @@ script = ExtResource("10_lcbk")
 [node name="CloudBackend" type="Node" parent="." unique_id=100000002]
 script = ExtResource("11_clbk")
 
-[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "backend", "emotion", "mood", "action", "perception")]
+[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "backend", "emotion", "mood", "action", "perception", "memory")]
 script = ExtResource("2_psu8r")
 config = ExtResource("3_psu8r")
 guardrail = NodePath("Guardrail")
@@ -36,6 +37,7 @@ emotion = NodePath("Emotion")
 mood = NodePath("Mood")
 action = NodePath("Action")
 perception = NodePath("Perception")
+memory = NodePath("Memory")
 metadata/_custom_type_script = "uid://c6v3cqah74xt4"
 
 [node name="Guardrail" type="Node" parent="NPCChat" unique_id=1585572361]
@@ -58,6 +60,10 @@ metadata/_custom_type_script = "uid://d2yljhten070k"
 [node name="Perception" type="Node" parent="NPCChat" unique_id=1168927664]
 script = ExtResource("12_se0ky")
 metadata/_custom_type_script = "uid://q0khf86xab5"
+
+[node name="Memory" type="Node" parent="NPCChat" unique_id=1036749924]
+script = ExtResource("13_4lh2r")
+metadata/_custom_type_script = "uid://6j1emyfqlp7k"
 
 [node name="UI" type="Control" parent="." unique_id=1265819672]
 layout_mode = 3
