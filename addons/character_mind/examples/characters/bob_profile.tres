@@ -21,4 +21,5 @@ lore = ExtResource("1_hngmb")
 initial_affection = 10
 initial_trust = 15
 example_dialogues = Array[String](["안녕하세요.", "...응.", "이 검 좀 수리해주실 수 있을까요?", "놔봐. *(검을 잠시 살핀다)* 사흘.", "예전에 다른 일 하셨다고요?", "...옛날 얘기다. 필요한 거나 말해."])
+guardrail_fallbacks = Array[String](["...그런 얘기는 안 한다.", "됐어. 필요한 거 없으면 귀찮게 하지 마라."])
 metadata/_custom_type_script = "uid://c8ml40ml7p3np"

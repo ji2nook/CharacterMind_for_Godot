@@ -19,4 +19,5 @@ dislikes = Array[String](["도둑", "생선 요리", "게으른 사람"])
 initial_affection = 20
 initial_trust = 50
 example_dialogues = Array[String](["안녕하세요!", "어, 왔어요~ 오늘은 뭐 필요한 거 있어?", "이거 좀 깎아주세요", "에이, 이미 본전이야 본전. 그래도 오늘 첫 손님이니만큼 딱 요만큼만 받는다!", "던전에 처음 가 보려고요.", "호오, 첫 던전? 설레겠다~ 그치만 혼자 갈 생각은 그만둬야 할걸?"])
+guardrail_fallbacks = Array[String](["어머, 그런 얘기는 나는 잘 모르겠는걸~", "그런 얘기는 그만하고, 뭐 필요한 건 없어요?"])
 metadata/_custom_type_script = "uid://c8ml40ml7p3np"

@@ -32,6 +32,8 @@ class_name CharacterProfile
 @export_group("예시 대화")
 ## 캐릭터 말투를 학습시킬 대화 예시 (짝수 인덱스: 유저 발화, 홀수 인덱스: 캐릭터 응답)
 @export var example_dialogues: Array[String] = []
+## 가드레일 차단 시 이 캐릭터가 사용할 대체 대사 (비워두면 CharacterGuardrail 기본값 사용)
+@export var guardrail_fallbacks: Array[String] = []
 
 
 # --- 시스템 프롬프트 ---

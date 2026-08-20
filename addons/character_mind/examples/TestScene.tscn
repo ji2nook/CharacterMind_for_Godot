@@ -42,7 +42,6 @@ metadata/_custom_type_script = "uid://c6v3cqah74xt4"
 
 [node name="Guardrail" type="Node" parent="NPCChat" unique_id=1585572361]
 script = ExtResource("4_ua7wq")
-blocked_keywords = Array[String](["금지어1", "금지어2"])
 metadata/_custom_type_script = "uid://ck487qvgluc6g"
 
 [node name="Emotion" type="Node" parent="NPCChat" unique_id=1321302597]

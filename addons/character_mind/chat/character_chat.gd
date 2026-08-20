@@ -54,14 +54,20 @@ func switch_character(new_profile: CharacterProfile) -> void:
 		mood.current_label = "NEUTRAL"
 		mood.current_intensity = 1
 		mood.mood_changed.emit(mood.current_label, mood.current_intensity)
+	if guardrail and new_profile:
+		guardrail._active_fallbacks = (
+			new_profile.guardrail_fallbacks
+			if not new_profile.guardrail_fallbacks.is_empty()
+			else guardrail.fallback_lines
+		)
 
 ## 플레이어 메시지를 백엔드에 전달
 func send_message(player_text: String) -> void:
 	if guardrail:
-		var checked := guardrail.check(player_text)
-		if checked != player_text:
-			guardrail_blocked.emit(checked)
-			response_received.emit(checked)
+		var filtered_input := guardrail.check_input(player_text)
+		if filtered_input != player_text:
+			guardrail_blocked.emit(filtered_input)
+			response_received.emit(filtered_input)
 			return
 
 	var system_text := _build_system_prompt()
@@ -140,12 +146,13 @@ func _on_response_finished(full_text: String) -> void:
 		emotion.tick()
 
 	if guardrail:
-		var result := guardrail.check(processed_text)
-		if result != processed_text:
+		var safe_text := guardrail.check_output(processed_text)
+		if safe_text != processed_text:
 			_needs_reset = true
-			guardrail_blocked.emit(result)
-			response_received.emit(result)
+			guardrail_blocked.emit(safe_text)
+			response_received.emit(safe_text)
 			return
+		processed_text = safe_text
 
 	if processed_text != "":
 		response_token.emit(processed_text)
