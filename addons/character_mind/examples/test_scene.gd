@@ -63,6 +63,9 @@ func _ready() -> void:
 	alice_button.pressed.connect(func(): _start_conversation(alice_profile))
 	bob_button.pressed.connect(func(): _start_conversation(bob_profile))
 	exit_button.pressed.connect(_end_conversation)
+	
+	if npc_chat.dialogue_state:
+		npc_chat.dialogue_state.state_changed.connect(_on_dialogue_state_changed)
 
 func _start_conversation(profile: CharacterProfile) -> void:
 	if profile == null:
@@ -220,3 +223,10 @@ func _on_request_failed(message: String) -> void:
 func _set_input_enabled(enabled: bool) -> void:
 	send_button.disabled = not enabled
 	input_box.editable = enabled
+
+func _on_dialogue_state_changed(new_state: CharacterDialogueState.State) -> void:
+	match new_state:
+		CharacterDialogueState.State.THINKING:
+			send_button.disabled = true
+		CharacterDialogueState.State.LISTENING:
+			send_button.disabled = false

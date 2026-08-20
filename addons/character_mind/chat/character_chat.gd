@@ -28,6 +28,8 @@ signal request_failed(message: String)
 @export var perception: CharacterPerception
 ## 대화 중 중요 정보를 저장하고 관련도 기반으로 검색하는 기억 노드
 @export var memory: CharacterMemory
+## 대화 상태 머신 노드 (턴 관리)
+@export var dialogue_state: CharacterDialogueState
 
 
 # --- 내부 상태 ---
@@ -69,6 +71,11 @@ func send_message(player_text: String) -> void:
 			guardrail_blocked.emit(filtered_input)
 			response_received.emit(filtered_input)
 			return
+	
+	if dialogue_state and dialogue_state.is_busy():
+		return
+	if dialogue_state:
+		dialogue_state.start_turn()
 
 	var system_text := _build_system_prompt()
 	if system_text != backend.system_prompt:
@@ -157,6 +164,9 @@ func _on_response_finished(full_text: String) -> void:
 	if processed_text != "":
 		response_token.emit(processed_text)
 	response_received.emit(processed_text)
+	
+	if dialogue_state:
+		dialogue_state.finish_turn()
 
 func _strip_emoji(text: String) -> String:
 	return _emoji_regex.sub(text, "", true)
