@@ -19,6 +19,8 @@ var current_profile: CharacterProfile
 @onready var chat_log = $UI/DialogueScreen/Layout/ChatLog
 @onready var status_label = $UI/DialogueScreen/Layout/StatusLabel
 
+@export var save_manager: CharacterSaveManager
+
 # --- 단어 단위 스트리밍 ---
 ## 가드레일을 통과한 단어들을 순서대로 보관하는 큐
 var _pending_tokens: Array[String] = []
@@ -41,6 +43,8 @@ var _scrollbar: VScrollBar
 var _action_regex: RegEx
 
 func _ready() -> void:
+	if save_manager:
+		save_manager.load_state()
 	_action_regex = RegEx.new()
 	_action_regex.compile("\\*\\(([^)]+)\\)\\*")
 	_scrollbar = chat_log.get_v_scroll_bar()

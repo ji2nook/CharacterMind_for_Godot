@@ -30,6 +30,8 @@ signal request_failed(message: String)
 @export var memory: CharacterMemory
 ## 대화 상태 머신 노드 (턴 관리)
 @export var dialogue_state: CharacterDialogueState
+## 캐릭터 상태 저장/로드 노드
+@export var save_manager: CharacterSaveManager
 
 
 # --- 내부 상태 ---
@@ -47,6 +49,8 @@ func _ready() -> void:
 
 ## 대화 상대를 다른 캐릭터로 전환
 func switch_character(new_profile: CharacterProfile) -> void:
+	if save_manager:
+		save_manager.save_state()
 	config.profile = new_profile
 	config.mark_dirty()
 	_needs_reset = true
@@ -167,6 +171,8 @@ func _on_response_finished(full_text: String) -> void:
 	
 	if dialogue_state:
 		dialogue_state.finish_turn()
+	if save_manager:
+		save_manager.on_turn_complete()
 
 func _strip_emoji(text: String) -> String:
 	return _emoji_regex.sub(text, "", true)

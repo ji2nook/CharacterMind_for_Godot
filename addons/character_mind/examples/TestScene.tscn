@@ -14,11 +14,13 @@
 [ext_resource type="Script" uid="uid://q0khf86xab5" path="res://addons/character_mind/perception/character_perception.gd" id="12_se0ky"]
 [ext_resource type="Script" uid="uid://6j1emyfqlp7k" path="res://addons/character_mind/memory/character_memory.gd" id="13_4lh2r"]
 [ext_resource type="Script" uid="uid://0vtp2p1qrh06" path="res://addons/character_mind/dialogue/character_dialogue_state.gd" id="14_sles3"]
+[ext_resource type="Script" uid="uid://cjbuq24dn048l" path="res://addons/character_mind/save/character_save_manager.gd" id="15_iwibk"]
 
-[node name="TestScene" type="Node" unique_id=197752086]
+[node name="TestScene" type="Node" unique_id=197752086 node_paths=PackedStringArray("save_manager")]
 script = ExtResource("1_s118h")
 alice_profile = ExtResource("2_k0n7s")
 bob_profile = ExtResource("3_nweab")
+save_manager = NodePath("NPCChat/SaveManager")
 
 [node name="SharedModel" type="NobodyWhoModel" parent="." unique_id=740376170]
 model_path = "res://models/qwen3-1.7b-instruct-q4_k_m.gguf"
@@ -29,7 +31,7 @@ script = ExtResource("10_lcbk")
 [node name="CloudBackend" type="Node" parent="." unique_id=100000002]
 script = ExtResource("11_clbk")
 
-[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "backend", "emotion", "mood", "action", "perception", "memory", "dialogue_state")]
+[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "backend", "emotion", "mood", "action", "perception", "memory", "dialogue_state", "save_manager")]
 script = ExtResource("2_psu8r")
 config = ExtResource("3_psu8r")
 guardrail = NodePath("Guardrail")
@@ -40,6 +42,7 @@ action = NodePath("Action")
 perception = NodePath("Perception")
 memory = NodePath("Memory")
 dialogue_state = NodePath("DialogueState")
+save_manager = NodePath("SaveManager")
 metadata/_custom_type_script = "uid://c6v3cqah74xt4"
 
 [node name="Guardrail" type="Node" parent="NPCChat" unique_id=1585572361]
@@ -69,6 +72,13 @@ metadata/_custom_type_script = "uid://6j1emyfqlp7k"
 [node name="DialogueState" type="Node" parent="NPCChat" unique_id=512401988]
 script = ExtResource("14_sles3")
 metadata/_custom_type_script = "uid://0vtp2p1qrh06"
+
+[node name="SaveManager" type="Node" parent="NPCChat" unique_id=1210015152 node_paths=PackedStringArray("emotion", "mood", "memory")]
+script = ExtResource("15_iwibk")
+emotion = NodePath("../Emotion")
+mood = NodePath("../Mood")
+memory = NodePath("../Memory")
+metadata/_custom_type_script = "uid://cjbuq24dn048l"
 
 [node name="UI" type="Control" parent="." unique_id=1265819672]
 layout_mode = 3
