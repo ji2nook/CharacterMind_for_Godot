@@ -28,6 +28,7 @@ class_name CharacterProfile
 @export_group("관계 초기값")
 @export var initial_affection: int = 0
 @export var initial_trust: int = 0
+@export var decay_interval: int = 10
 
 @export_group("예시 대화")
 ## 캐릭터 말투를 학습시킬 대화 예시 (짝수 인덱스: 유저 발화, 홀수 인덱스: 캐릭터 응답)

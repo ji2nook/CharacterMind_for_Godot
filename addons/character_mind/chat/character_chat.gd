@@ -42,6 +42,7 @@ var _emoji_regex: RegEx
 func _ready() -> void:
 	_emoji_regex = RegEx.new()
 	_emoji_regex.compile("[\\x{1F000}-\\x{1FAFF}\\x{2600}-\\x{27BF}\\x{FE00}-\\x{FEFF}]")
+	_apply_config_to_nodes()
 	backend.system_prompt = _build_system_prompt()
 	backend.response_finished.connect(_on_response_finished)
 	backend.request_failed.connect(request_failed.emit)
@@ -56,6 +57,7 @@ func switch_character(new_profile: CharacterProfile) -> void:
 	_needs_reset = true
 	if emotion and new_profile:
 		emotion.reset_to(new_profile.initial_affection, new_profile.initial_trust)
+		emotion.decay_interval = new_profile.decay_interval
 	if mood:
 		mood.current_label = "NEUTRAL"
 		mood.current_intensity = 1
@@ -198,3 +200,13 @@ func _strip_thinking(text: String) -> String:
 	if end_idx == -1:
 		return text.strip_edges()
 	return text.substr(end_idx + THINK_CLOSE_LEN).strip_edges()
+
+func _apply_config_to_nodes() -> void:
+	if guardrail and config:
+		guardrail.blocked_categories = config.blocked_categories
+		guardrail.fallback_lines = config.guardrail_fallback_lines
+	if emotion and config.profile:
+		emotion.decay_interval = config.profile.decay_interval
+	if memory and config:
+		memory.max_entries = config.max_memory_entries
+		memory.entries_per_prompt = config.memory_entries_per_prompt

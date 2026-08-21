@@ -31,7 +31,7 @@ script = ExtResource("10_lcbk")
 [node name="CloudBackend" type="Node" parent="." unique_id=100000002]
 script = ExtResource("11_clbk")
 
-[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "backend", "emotion", "mood", "action", "perception", "memory", "dialogue_state", "save_manager", "embedding_node")]
+[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "backend", "emotion", "mood", "action", "perception", "memory", "dialogue_state", "save_manager")]
 script = ExtResource("2_psu8r")
 config = ExtResource("3_psu8r")
 guardrail = NodePath("Guardrail")
@@ -43,7 +43,6 @@ perception = NodePath("Perception")
 memory = NodePath("Memory")
 dialogue_state = NodePath("DialogueState")
 save_manager = NodePath("SaveManager")
-embedding_node = NodePath("EmbeddingModel")
 metadata/_custom_type_script = "uid://c6v3cqah74xt4"
 
 [node name="Guardrail" type="Node" parent="NPCChat" unique_id=1585572361]

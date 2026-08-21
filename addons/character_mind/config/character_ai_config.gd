@@ -16,6 +16,21 @@ class_name CharacterAIConfig
 ## 금지 키워드
 @export var forbidden_topics: Array[String] = ["정치", "혐오 발언"]
 
+@export_group("가드레일")
+@export var blocked_categories: Dictionary = {
+	"정치": ["정치키워드1", "정치키워드2"],
+	"혐오발언": ["혐오키워드1", "혐오키워드2"],
+	"선정성": ["선정적키워드1", "선정적키워드2"],
+}
+@export var guardrail_fallback_lines: Array[String] = [
+	"어... 무슨 얘기인지 모르겠어요.",
+	"다른 이야기를 해 볼까요?",
+]
+
+@export_group("메모리")
+@export var max_memory_entries: int = 20
+@export var memory_entries_per_prompt: int = 3
+
 var _cached_prompt: String = ""
 var _prompt_dirty: bool = true
 

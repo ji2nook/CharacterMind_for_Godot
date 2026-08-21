@@ -1,8 +1,8 @@
 extends Node
 class_name CharacterMemory
 
-@export var max_entries: int = 20
-@export var entries_per_prompt: int = 3
+var max_entries: int = 20
+var entries_per_prompt: int = 3
 @export var embedding_node: Node
 
 var entries: Array[Dictionary] = []

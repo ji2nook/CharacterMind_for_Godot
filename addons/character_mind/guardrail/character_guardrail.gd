@@ -1,15 +1,8 @@
 extends Node
 class_name CharacterGuardrail
 
-@export var blocked_categories: Dictionary = {
-	"정치": ["정치키워드1", "정치키워드1"],
-	"혐오발언": ["혐오키워드1", "혐오키워드2"],
-	"선정성": ["선정적키워드1", "선정적키워드2"],
-}
-@export var fallback_lines: Array[String] = [
-	"어... 무슨 얘기인지 모르겠어요.",
-	"다른 이야기를 해 볼까요?"
-]
+@export var blocked_categories: Dictionary = {}
+@export var fallback_lines: Array[String] = []
 
 ## 현재 활성 캐릭터의 fallback 대사 — switch_character() 시 CharacterChat이 교체
 var _active_fallbacks: Array[String] = []
