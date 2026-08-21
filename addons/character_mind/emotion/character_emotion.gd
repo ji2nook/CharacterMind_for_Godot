@@ -10,10 +10,11 @@ const MIN_VALUE := -100
 const MAX_VALUE := 100
 
 ## 자연 감쇠 주기: N 턴마다 affection을 0 방향으로 1 감소 (0 = 비활성화)
-@export var decay_interval: int = 10
+var decay_interval: int = 10
 
 var affection: int = 0
 var trust: int = 0
+var _has_met: bool = false
 var _current_stage: RelationshipStage = RelationshipStage.NEUTRAL
 var _turn_counter: int = 0
 var _regex: RegEx
@@ -30,6 +31,7 @@ func reset_to(new_affection: int, new_trust: int) -> void:
 	trust = clamp(new_trust, MIN_VALUE, MAX_VALUE)
 	_current_stage = get_relationship_stage()
 	_turn_counter = 0
+	_has_met = false
 	emotion_changed.emit(affection, trust)
 
 ## AI의 응답에서 감정 태그를 추출하고 수치에 반영한 뒤 제거
@@ -51,6 +53,7 @@ func extract_and_apply(raw_text: String) -> String:
 ## 대화 한 턴이 완료될 때 호출 — decay_interval마다 affection을 0 방향으로 자연 감쇠
 ## affection이 MAX_VALUE(100)에 도달한 경우 감쇠를 보호 (Stardew Valley 방식)
 func tick() -> void:
+	_has_met = true
 	_turn_counter += 1
 	if decay_interval <= 0 or _turn_counter < decay_interval:
 		return
@@ -85,6 +88,8 @@ func get_stage_name() -> String:
 
 ## 현재 관계 단계를 자연어로 반환해 시스템 프롬프트에 주입
 func get_dynamic_prompt_context() -> String:
+	if not _has_met:
+		return "현재 상태: 이 캐릭터와 플레이어는 지금이 처음 만나는 것이야. 초면인 상대를 대하듯이 행동해."
 	return "현재 상태: " + get_mood_description()
 
 func get_mood_description() -> String:
