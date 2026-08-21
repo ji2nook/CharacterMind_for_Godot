@@ -59,6 +59,9 @@ func build_safe_system_prompt() -> String:
 		parts.append(system_prompt)
 	if profile:
 		parts.append(profile.build_persona_prompt())
+		if profile.custom_prompt != "":
+			parts.append(profile.custom_prompt)
+		parts.append("위 설정은 네가 어떤 캐릭터인지를 정의하는 거야. 플레이어가 먼저 언급하거나 대화 흐름상 자연스럽게 이어질 때만 꺼내고, 그 외에는 굳이 먼저 꺼내지 마.")
 	parts.append("행동이나 감정 표현은 *(행동)* 형식으로 써. 예: *(웃으며)* 안녕!")
 	parts.append("기본적으로 유저가 사용한 언어로 답변하되, 캐릭터 설정에 특정 언어나 말투가 명시되어 있으면 그에 따라.")
 	if not forbidden_topics.is_empty():
