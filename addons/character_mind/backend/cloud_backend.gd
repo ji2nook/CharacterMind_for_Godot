@@ -41,6 +41,7 @@ func _ready() -> void:
 	_http.request_completed.connect(_on_request_completed)
 	_api_key_cached = _resolve_api_key()
 
+## 메시지를 API에 전달한다 — raw_message는 히스토리에 저장할 컨텍스트 없는 순수 플레이어 텍스트
 func say(message: String, raw_message: String = "") -> void:
 	_last_user_message = message
 	_last_raw_user_message = raw_message if raw_message != "" else message

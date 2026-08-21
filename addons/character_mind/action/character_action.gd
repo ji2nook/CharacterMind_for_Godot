@@ -37,6 +37,7 @@ func set_action_enabled(action_id: String, enabled: bool) -> void:
 		action_def.enabled = enabled
 		_instruction_dirty = true
 
+## 활성화된 액션 목록을 시스템 프롬프트에 추가할 지시문으로 반환한다 — 활성 액션이 없으면 빈 문자열
 func build_action_instruction() -> String:
 	if not _instruction_dirty:
 		return _instruction_cache

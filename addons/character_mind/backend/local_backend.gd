@@ -11,6 +11,7 @@ var _chat: NobodyWhoChat
 func _ready() -> void:
 	_setup_chat()
 
+## 메시지를 로컬 모델에 전달한다 — 로컬 백엔드는 히스토리를 NobodyWhoChat이 관리하므로 raw_message를 사용하지 않는다
 func say(message: String, _raw_message: String = "") -> void:
 	if _chat.system_prompt != system_prompt:
 		_chat.system_prompt = system_prompt

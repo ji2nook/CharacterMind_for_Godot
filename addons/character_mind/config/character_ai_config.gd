@@ -17,18 +17,22 @@ class_name CharacterAIConfig
 @export var forbidden_topics: Array[String] = ["정치", "혐오 발언"]
 
 @export_group("가드레일")
+## 차단할 카테고리와 키워드 매핑 — {"카테고리명": ["키워드1", "키워드2"]} 형식으로 작성한다
 @export var blocked_categories: Dictionary = {
 	"정치": ["정치키워드1", "정치키워드2"],
 	"혐오발언": ["혐오키워드1", "혐오키워드2"],
 	"선정성": ["선정적키워드1", "선정적키워드2"],
 }
+## 가드레일 차단 시 기본 대체 대사 — 캐릭터별 fallback은 CharacterProfile에서 별도 설정 가능하다
 @export var guardrail_fallback_lines: Array[String] = [
 	"어... 무슨 얘기인지 모르겠어요.",
 	"다른 이야기를 해 볼까요?",
 ]
 
 @export_group("메모리")
+## 캐릭터가 기억할 수 있는 최대 항목 수
 @export var max_memory_entries: int = 20
+## 한 번의 턴에 프롬프트로 주입할 최대 기억 수
 @export var memory_entries_per_prompt: int = 3
 
 var _cached_prompt: String = ""
@@ -59,7 +63,7 @@ func build_mood_instruction() -> String:
 	)
 
 
-# --- 시스템 프롬프트 + 가드레일 정의 ---
+## 현재 설정을 기반으로 시스템 프롬프트를 빌드해 반환한다 — 캐시를 활용하며 mark_dirty() 후에만 재빌드된다
 func build_safe_system_prompt() -> String:
 	if not _prompt_dirty:
 		return _cached_prompt

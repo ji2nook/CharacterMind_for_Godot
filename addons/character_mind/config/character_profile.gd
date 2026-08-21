@@ -31,16 +31,16 @@ class_name CharacterProfile
 @export var decay_interval: int = 10
 
 @export_group("예시 대화")
-## 캐릭터 말투를 학습시킬 대화 예시 (짝수 인덱스: 유저 발화, 홀수 인덱스: 캐릭터 응답)
+## 캐릭터 말투를 학습시킬 대화 예시 — 짝수 인덱스: 유저 발화, 홀수 인덱스: 캐릭터 응답
 @export var example_dialogues: Array[String] = []
-## 가드레일 차단 시 이 캐릭터가 사용할 대체 대사 (비워두면 CharacterGuardrail 기본값 사용)
+## 가드레일 차단 시 이 캐릭터가 말할 대체 대사 — 비워두면 CharacterAIConfig의 기본 fallback을 사용한다
 @export var guardrail_fallbacks: Array[String] = []
 
 @export_group("커스텀 프롬프트")
-## 개발자가 자유롭게 추가할 수 있는 프롬프트 (캐릭터 설정을 보완하는 추가 지시)
+## 위 설정 외에 추가로 주입할 프롬프트 — 특수한 행동 규칙이나 말투 세부 조정에 사용한다
 @export_multiline var custom_prompt: String = ""
 
-# --- 시스템 프롬프트 ---
+## 프로필 설정 전체를 시스템 프롬프트용 문자열로 변환한다
 func build_persona_prompt() -> String:
 	var lines: Array[String] = []
 	lines.append("[%s의 설정]" % character_name)

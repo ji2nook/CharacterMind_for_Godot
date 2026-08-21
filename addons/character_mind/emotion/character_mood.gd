@@ -3,9 +3,12 @@ class_name CharacterMood
 
 signal mood_changed(label: String, intensity: int)
 
+## LLM이 사용할 수 있는 감정 레이블 목록 — 이 외의 레이블은 extract_and_apply()에서 무시된다
 const LABELS := ["NEUTRAL", "JOY", "ANGER", "SADNESS", "SURPRISE", "AFFECTION", "DISTRUST"]
+## 현재 감정 레이블
 var current_label: String = "NEUTRAL"
-var current_intensity: int = 1  # 1=약함, 2=보통, 3=강함
+## 현재 감정 강도 (1=약함, 2=보통, 3=강함)
+var current_intensity: int = 1
 var _regex: RegEx
 
 func _ready() -> void:
@@ -27,5 +30,6 @@ func extract_and_apply(raw_text: String) -> String:
 		return raw_text.replace(result.get_string(0), "").strip_edges()
 	return raw_text
 
+## 현재 감정을 프롬프트 주입용 한 줄 문자열로 반환한다
 func get_mood_prompt_line() -> String:
 	return "현재 캐릭터의 감정: %s" % current_label

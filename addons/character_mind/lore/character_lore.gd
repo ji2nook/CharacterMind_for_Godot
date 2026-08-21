@@ -1,6 +1,8 @@
 extends Resource
 class_name CharacterLore
 
+## 배경 지식 조각 목록 — 각 항목은 한 사실을 담은 짧은 문장으로 작성한다
+## 대화 내용과 관련 있는 항목만 골라 프롬프트에 주입되므로 항목을 세분화할수록 정확도가 높아진다
 @export var entries: Array[String] = []
 
 ## 현재 대화와 관련도가 높은 로어 조각 상위 top_k개를 반환
