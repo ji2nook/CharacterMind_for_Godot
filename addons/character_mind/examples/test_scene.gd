@@ -13,15 +13,13 @@ extends Node
 var current_profile: CharacterProfile
 
 # --- UI 노드 참조 : 대화 페이지 ---
-@onready var npc_chat = $NPCChat
-@onready var input_box = $UI/DialogueScreen/Layout/InputRow/InputBox
-@onready var send_button = $UI/DialogueScreen/Layout/InputRow/SendButton
-@onready var chat_log = $UI/DialogueScreen/Layout/ChatLog
-@onready var status_label = $UI/DialogueScreen/Layout/StatusLabel
+@onready var npc_chat: CharacterChat = $NPCChat
+@onready var input_box: LineEdit = $UI/DialogueScreen/Layout/InputRow/InputBox
+@onready var send_button: Button = $UI/DialogueScreen/Layout/InputRow/SendButton
+@onready var chat_log: RichTextLabel = $UI/DialogueScreen/Layout/ChatLog
+@onready var status_label: Label = $UI/DialogueScreen/Layout/StatusLabel
 
 @onready var _embedding_model: Node = $NPCChat/EmbeddingModel
-
-@export var save_manager: CharacterSaveManager
 
 # --- 단어 단위 스트리밍 ---
 ## 가드레일을 통과한 단어들을 순서대로 보관하는 큐
@@ -47,8 +45,6 @@ var _action_regex: RegEx
 func _ready() -> void:
 	if _embedding_model:
 		_embedding_model.start_worker()
-	if save_manager:
-		save_manager.load_state()
 	_action_regex = RegEx.new()
 	_action_regex.compile("\\*\\(([^)]+)\\)\\*")
 	_scrollbar = chat_log.get_v_scroll_bar()
@@ -72,9 +68,6 @@ func _ready() -> void:
 	bob_button.pressed.connect(func(): _start_conversation(bob_profile))
 	exit_button.pressed.connect(_end_conversation)
 	
-	if npc_chat.dialogue_state:
-		npc_chat.dialogue_state.state_changed.connect(_on_dialogue_state_changed)
-
 func _start_conversation(profile: CharacterProfile) -> void:
 	if profile == null:
 		return
@@ -116,8 +109,6 @@ func _process(delta: float) -> void:
 	if _token_timer < TOKEN_INTERVAL:
 		return
 	_token_timer = 0.0
-	if _token_read_idx >= _pending_tokens.size():
-		return
 	var token: String = _pending_tokens[_token_read_idx]
 	_token_read_idx += 1
 	if _token_read_idx >= _pending_tokens.size():
@@ -231,10 +222,3 @@ func _on_request_failed(message: String) -> void:
 func _set_input_enabled(enabled: bool) -> void:
 	send_button.disabled = not enabled
 	input_box.editable = enabled
-
-func _on_dialogue_state_changed(new_state: CharacterDialogueState.State) -> void:
-	match new_state:
-		CharacterDialogueState.State.THINKING:
-			send_button.disabled = true
-		CharacterDialogueState.State.LISTENING:
-			send_button.disabled = false

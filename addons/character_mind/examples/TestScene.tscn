@@ -16,11 +16,10 @@
 [ext_resource type="Script" uid="uid://0vtp2p1qrh06" path="res://addons/character_mind/dialogue/character_dialogue_state.gd" id="14_sles3"]
 [ext_resource type="Script" uid="uid://cjbuq24dn048l" path="res://addons/character_mind/save/character_save_manager.gd" id="15_iwibk"]
 
-[node name="TestScene" type="Node" unique_id=197752086 node_paths=PackedStringArray("save_manager")]
+[node name="TestScene" type="Node" unique_id=197752086]
 script = ExtResource("1_s118h")
 alice_profile = ExtResource("2_k0n7s")
 bob_profile = ExtResource("3_nweab")
-save_manager = NodePath("NPCChat/SaveManager")
 
 [node name="SharedModel" type="NobodyWhoModel" parent="." unique_id=740376170]
 model_path = "res://models/qwen3-1.7b-instruct-q4_k_m.gguf"

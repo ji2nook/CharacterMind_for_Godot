@@ -12,7 +12,9 @@ const MAX_VALUE := 100
 ## 자연 감쇠 주기: N 턴마다 affection을 0 방향으로 1 감소 (0 = 비활성화)
 var decay_interval: int = 10
 
+## 플레이어에 대한 호감도 (-100 ~ 100)
 var affection: int = 0
+## 플레이어에 대한 신뢰도 (-100 ~ 100) — affection과 달리 자연 감쇠하지 않는다
 var trust: int = 0
 var _has_met: bool = false
 var _current_stage: RelationshipStage = RelationshipStage.NEUTRAL
@@ -67,6 +69,7 @@ func tick() -> void:
 	emotion_changed.emit(affection, trust)
 	_check_stage_change()
 
+## 현재 affection 수치를 기준으로 관계 단계를 반환한다
 func get_relationship_stage() -> RelationshipStage:
 	if affection >= 70:
 		return RelationshipStage.FRIENDLY
@@ -78,8 +81,12 @@ func get_relationship_stage() -> RelationshipStage:
 		return RelationshipStage.COLD
 	return RelationshipStage.HOSTILE
 
+## 현재 관계 단계를 문자열로 반환한다 (예: "WARM")
 func get_stage_name() -> String:
-	match get_relationship_stage():
+	return _stage_to_string(get_relationship_stage())
+
+func _stage_to_string(stage: RelationshipStage) -> String:
+	match stage:
 		RelationshipStage.FRIENDLY: return "FRIENDLY"
 		RelationshipStage.WARM:     return "WARM"
 		RelationshipStage.NEUTRAL:  return "NEUTRAL"
@@ -92,6 +99,7 @@ func get_dynamic_prompt_context() -> String:
 		return "현재 상태: 이 캐릭터와 플레이어는 지금이 처음 만나는 것이야. 초면인 상대를 대하듯이 행동해."
 	return "현재 상태: " + get_mood_description()
 
+## 현재 관계 상태를 자연어로 반환한다 — 시스템 프롬프트 컨텍스트 주입에 사용된다
 func get_mood_description() -> String:
 	match get_relationship_stage():
 		RelationshipStage.FRIENDLY: return "캐릭터는 플레이어를 매우 친밀하게 여깁니다."
@@ -104,4 +112,4 @@ func _check_stage_change() -> void:
 	var new_stage := get_relationship_stage()
 	if new_stage != _current_stage:
 		_current_stage = new_stage
-		stage_changed.emit(get_stage_name())
+		stage_changed.emit(_stage_to_string(new_stage))

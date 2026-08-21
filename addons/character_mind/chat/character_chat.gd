@@ -50,11 +50,13 @@ func _ready() -> void:
 
 ## 대화 상대를 다른 캐릭터로 전환
 func switch_character(new_profile: CharacterProfile) -> void:
-	if save_manager:
+	# 이전 캐릭터가 있으면 현재 상태를 먼저 저장
+	if save_manager and config.profile:
 		save_manager.save_state()
 	config.profile = new_profile
 	config.mark_dirty()
 	_needs_reset = true
+	# 초기값으로 리셋 — 세이브 파일이 없을 때의 기본 출발점
 	if emotion and new_profile:
 		emotion.reset_to(new_profile.initial_affection, new_profile.initial_trust)
 		emotion.decay_interval = new_profile.decay_interval
@@ -62,6 +64,10 @@ func switch_character(new_profile: CharacterProfile) -> void:
 		mood.current_label = "NEUTRAL"
 		mood.current_intensity = 1
 		mood.mood_changed.emit(mood.current_label, mood.current_intensity)
+	# 세이브 파일이 있으면 로드해 초기값을 덮어씀 — load_state() 내부에서 시그널 emit
+	if save_manager and new_profile:
+		save_manager.set_character(new_profile.character_name)
+		save_manager.load_state()
 	if guardrail and new_profile:
 		guardrail._active_fallbacks = (
 			new_profile.guardrail_fallbacks
@@ -89,9 +95,6 @@ func send_message(player_text: String) -> void:
 		_do_send(player_text, query_emb)
 	else:
 		_do_send(player_text, [])
-
-func _do_say(message: String, raw_message: String) -> void:
-	backend.say(message, raw_message)
 
 func _encode_query(text: String) -> Array:
 	var encoder = memory.embedding_node
@@ -134,7 +137,7 @@ func _do_send(player_text: String, query_embedding: Array) -> void:
 		_needs_reset = false
 		backend.reset()
 		# LocalBackend는 reset() 후 한 프레임이 필요하므로 deferred 호출
-		call_deferred("_do_say", message, player_text)
+		backend.say.call_deferred(message, player_text)
 		return
 
 	backend.say(message, player_text)
@@ -157,6 +160,8 @@ func _build_system_prompt() -> String:
 func _on_response_finished(full_text: String) -> void:
 	if _is_repetition_loop(full_text):
 		_needs_reset = true
+		if dialogue_state:
+			dialogue_state.finish_turn()
 		request_failed.emit("응답 생성 중 오류가 발생했습니다. 다시 시도해주세요.")
 		return
 
@@ -176,6 +181,10 @@ func _on_response_finished(full_text: String) -> void:
 		var safe_text := guardrail.check_output(processed_text)
 		if safe_text != processed_text:
 			_needs_reset = true
+			if dialogue_state:
+				dialogue_state.finish_turn()
+			if save_manager:
+				save_manager.on_turn_complete()
 			guardrail_blocked.emit(safe_text)
 			response_received.emit(safe_text)
 			return
