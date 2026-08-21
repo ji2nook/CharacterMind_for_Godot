@@ -51,6 +51,8 @@ func load_state() -> void:
 		var typed: Array[Dictionary] = []
 		for e in raw:
 			if e is Dictionary:
+				if not e.has("embedding"):
+					e["embedding"] = []
 				typed.append(e)
 		memory.entries = typed
 		memory.turn_count = data.get("turn_count", 0)

@@ -19,6 +19,8 @@ var current_profile: CharacterProfile
 @onready var chat_log = $UI/DialogueScreen/Layout/ChatLog
 @onready var status_label = $UI/DialogueScreen/Layout/StatusLabel
 
+@onready var _embedding_model: Node = $NPCChat/EmbeddingModel
+
 @export var save_manager: CharacterSaveManager
 
 # --- 단어 단위 스트리밍 ---
@@ -43,6 +45,8 @@ var _scrollbar: VScrollBar
 var _action_regex: RegEx
 
 func _ready() -> void:
+	if _embedding_model:
+		_embedding_model.start_worker()
 	if save_manager:
 		save_manager.load_state()
 	_action_regex = RegEx.new()

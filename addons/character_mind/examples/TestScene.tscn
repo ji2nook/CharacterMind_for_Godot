@@ -31,7 +31,7 @@ script = ExtResource("10_lcbk")
 [node name="CloudBackend" type="Node" parent="." unique_id=100000002]
 script = ExtResource("11_clbk")
 
-[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "backend", "emotion", "mood", "action", "perception", "memory", "dialogue_state", "save_manager")]
+[node name="NPCChat" type="Node" parent="." unique_id=1196724220 node_paths=PackedStringArray("guardrail", "backend", "emotion", "mood", "action", "perception", "memory", "dialogue_state", "save_manager", "embedding_node")]
 script = ExtResource("2_psu8r")
 config = ExtResource("3_psu8r")
 guardrail = NodePath("Guardrail")
@@ -43,6 +43,7 @@ perception = NodePath("Perception")
 memory = NodePath("Memory")
 dialogue_state = NodePath("DialogueState")
 save_manager = NodePath("SaveManager")
+embedding_node = NodePath("EmbeddingModel")
 metadata/_custom_type_script = "uid://c6v3cqah74xt4"
 
 [node name="Guardrail" type="Node" parent="NPCChat" unique_id=1585572361]
@@ -65,8 +66,9 @@ metadata/_custom_type_script = "uid://d2yljhten070k"
 script = ExtResource("12_se0ky")
 metadata/_custom_type_script = "uid://q0khf86xab5"
 
-[node name="Memory" type="Node" parent="NPCChat" unique_id=1036749924]
+[node name="Memory" type="Node" parent="NPCChat" unique_id=1036749924 node_paths=PackedStringArray("embedding_node")]
 script = ExtResource("13_4lh2r")
+embedding_node = NodePath("../EmbeddingModel")
 metadata/_custom_type_script = "uid://6j1emyfqlp7k"
 
 [node name="DialogueState" type="Node" parent="NPCChat" unique_id=512401988]
@@ -79,6 +81,12 @@ emotion = NodePath("../Emotion")
 mood = NodePath("../Mood")
 memory = NodePath("../Memory")
 metadata/_custom_type_script = "uid://cjbuq24dn048l"
+
+[node name="EncoderModel" type="NobodyWhoModel" parent="NPCChat" unique_id=1999564123]
+model_path = "res://models/nomic-embed-text-v1.5.Q8_0.gguf"
+
+[node name="EmbeddingModel" type="NobodyWhoEncoder" parent="NPCChat" unique_id=1632233424 node_paths=PackedStringArray("model_node")]
+model_node = NodePath("../EncoderModel")
 
 [node name="UI" type="Control" parent="." unique_id=1265819672]
 layout_mode = 3

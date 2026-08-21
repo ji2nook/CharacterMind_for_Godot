@@ -80,7 +80,24 @@ func send_message(player_text: String) -> void:
 		return
 	if dialogue_state:
 		dialogue_state.start_turn()
+	
+	# 임베딩 기반 검색이 가능하다면 쿼리를 먼저 인코딩하고 완료 후 진행
+	if memory and memory.embedding_node and memory.has_embeddings():
+		var query_emb: Array = await _encode_query(player_text)
+		_do_send(player_text, query_emb)
+	else:
+		_do_send(player_text, [])
 
+func _do_say(message: String, raw_message: String) -> void:
+	backend.say(message, raw_message)
+
+func _encode_query(text: String) -> Array:
+	var encoder = memory.embedding_node
+	encoder.encode(text)
+	var emb: PackedFloat32Array = await encoder.encoding_finished
+	return Array(emb)
+
+func _do_send(player_text: String, query_embedding: Array) -> void:
 	var system_text := _build_system_prompt()
 	if system_text != backend.system_prompt:
 		backend.system_prompt = system_text
@@ -95,7 +112,7 @@ func send_message(player_text: String) -> void:
 	if perception:
 		context_parts.append(perception.build_context_line())
 	if memory:
-		var summary := memory.get_relevant_summary(player_text)
+		var summary := memory.get_relevant_summary(player_text, query_embedding)
 		if summary != "":
 			context_parts.append("관련 기억:\n- " + summary)
 	if config.shared_lore:
@@ -119,9 +136,6 @@ func send_message(player_text: String) -> void:
 		return
 
 	backend.say(message, player_text)
-
-func _do_say(message: String, raw_message: String) -> void:
-	backend.say(message, raw_message)
 
 ## 앞 30자 패턴이 5회 이상 반복되면 반복 루프로 판단한다
 func _is_repetition_loop(text: String) -> bool:
